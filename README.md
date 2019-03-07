@@ -1,6 +1,6 @@
-#代码非常简单
+# 代码非常简单
 
-##详细示例见本项目app下的MainActivity
+## 详细示例见本项目app下的MainActivity
 一个listAdapter只需要如下几行
 ```
     public class ListAdapter extends BaseAdapterRvList<BaseViewHolder, String> {
@@ -26,5 +26,5 @@
         }
     }
 ```
-##导入方式
-implementation（或api） 'com.github.weimingjue:BaseAdapter:1.0'
+## 导入方式
+`implementation（或api） 'com.github.weimingjue:BaseAdapter:1.0'`
