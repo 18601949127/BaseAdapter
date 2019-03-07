@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
      * 简单的列表测试
      */
     private void listTest() {
-        mRv.setLayoutManager(new LinearLayoutManager(this));
+        GridLayoutManager manager = new GridLayoutManager(this, 2);
+        mRv.setLayoutManager(manager);
         final ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 200; i++) {
             list.add("第" + i);
         }
         ListAdapter adapter = new ListAdapter(this, list);
@@ -69,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
         iv.setImageResource(R.mipmap.ic_launcher);
         iv.setAdjustViewBounds(true);
         adapter.addFooterView(iv);
+        //GridLayoutManager需要将头或尾占多行
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return position == list.size() ? 2 : 1;
+            }
+        });
     }
 
 
