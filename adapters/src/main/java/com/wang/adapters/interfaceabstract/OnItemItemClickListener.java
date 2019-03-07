@@ -1,4 +1,4 @@
-package com.wang.mylibrary.interfaceabstract;
+package com.wang.adapters.interfaceabstract;
 
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import com.wang.mylibrary.R;
+import com.wang.adapters.R;
 
 /**
  * 高级功能:adapter套adapter的点击事件,具体用法见实现类

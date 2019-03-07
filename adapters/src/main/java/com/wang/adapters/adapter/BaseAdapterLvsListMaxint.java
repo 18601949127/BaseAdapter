@@ -1,24 +1,24 @@
-package com.wang.mylibrary.adapter;
+package com.wang.adapters.adapter;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.wang.mylibrary.base.BaseViewHolder;
-import com.wang.mylibrary.interfaceabstract.IAdapterList;
-import com.wang.mylibrary.utils.Utils;
+import com.wang.adapters.base.BaseViewHolder;
+import com.wang.adapters.interfaceabstract.IAdapterList;
+import com.wang.adapters.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 无限滑动的adapter
+ * 无限滑动的adapter（主要适用于vp）
  */
-public abstract class BaseAdapterRvListMaxint<VH extends BaseViewHolder, BEAN> extends BaseAdapterRv<VH> implements IAdapterList<BEAN> {
+public abstract class BaseAdapterLvsListMaxint<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<VH> implements IAdapterList<BEAN> {
 
     public List<BEAN> mList;
 
-    public BaseAdapterRvListMaxint(@NonNull Activity activity, @Nullable List<BEAN> list) {
+    public BaseAdapterLvsListMaxint(@NonNull Activity activity, @Nullable List<BEAN> list) {
         super(activity);
         mList = list;
     }
@@ -29,7 +29,7 @@ public abstract class BaseAdapterRvListMaxint<VH extends BaseViewHolder, BEAN> e
     }
 
     @Override
-    protected final void onBindVH(VH holder, int position) {
+    public final void onBindViewHolder(VH holder, int position) {
         //对position进行了%处理
         position = position % mList.size();
         onBindVH(holder, position, mList.get(position));

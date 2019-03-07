@@ -1,4 +1,4 @@
-package com.wang.mylibrary.interfaceabstract;
+package com.wang.adapters.interfaceabstract;
 
 /**
  * 所有adapter的接口

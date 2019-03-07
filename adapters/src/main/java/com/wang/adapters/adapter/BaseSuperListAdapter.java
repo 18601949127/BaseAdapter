@@ -1,4 +1,4 @@
-package com.wang.mylibrary.adapter;
+package com.wang.adapters.adapter;
 
 import android.app.Activity;
 import android.support.annotation.IntRange;
@@ -11,9 +11,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.wang.mylibrary.R;
-import com.wang.mylibrary.base.BaseViewHolder;
-import com.wang.mylibrary.interfaceabstract.IItemClick;
+import com.wang.adapters.R;
+import com.wang.adapters.base.BaseViewHolder;
+import com.wang.adapters.interfaceabstract.IItemClick;
 
 import java.util.ArrayList;
 import java.util.List;

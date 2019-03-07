@@ -1,4 +1,4 @@
-package com.wang.mylibrary.adapter;
+package com.wang.adapters.adapter;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -7,7 +7,7 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wang.mylibrary.utils.Utils;
+import com.wang.adapters.utils.Utils;
 
 import java.util.ArrayList;
 

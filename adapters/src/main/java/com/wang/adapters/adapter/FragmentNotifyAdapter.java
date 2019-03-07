@@ -1,4 +1,4 @@
-package com.wang.mylibrary.adapter;
+package com.wang.adapters.adapter;
 
 import android.os.Parcelable;
 import android.support.annotation.NonNull;

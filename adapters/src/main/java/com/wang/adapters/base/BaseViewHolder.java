@@ -1,4 +1,4 @@
-package com.wang.mylibrary.base;
+package com.wang.adapters.base;
 
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;

@@ -1,4 +1,4 @@
-package com.wang.mylibrary.adapter;
+package com.wang.adapters.adapter;
 
 import android.app.Activity;
 import android.support.annotation.IntRange;
@@ -10,10 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
 
-import com.wang.mylibrary.R;
-import com.wang.mylibrary.base.BaseViewHolder;
-import com.wang.mylibrary.interfaceabstract.IAdapter;
-import com.wang.mylibrary.interfaceabstract.IItemClick;
+import com.wang.adapters.R;
+import com.wang.adapters.base.BaseViewHolder;
+import com.wang.adapters.interfaceabstract.IAdapter;
+import com.wang.adapters.interfaceabstract.IAdapterList;
+import com.wang.adapters.interfaceabstract.IItemClick;
+import com.wang.adapters.interfaceabstract.OnItemClickListener;
 
 /**
  * 超级adapter，适用于listview、gridview、viewpager
@@ -83,7 +85,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
 
     /**
      * lv为了方便,可以在lv直接获取你想要的数据,但是理论上没啥用
-     * list的使用见{@link com.wang.mylibrary.interfaceabstract.IAdapterList}的get、clear、addAll
+     * list的使用见{@link IAdapterList}的get、clear、addAll
      */
     @Override
     public final Object getItem(int position) {
@@ -173,7 +175,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     /**
      * 这里的点击事件不会因有checkbox而被抢焦点
      * 里面也有LongClick
-     * 监听事件一般使用实现类{@link com.wang.mylibrary.interfaceabstract.OnItemClickListener}
+     * 监听事件一般使用实现类{@link OnItemClickListener}
      */
     public void setOnItemClickListener(IItemClick listener) {
         mListener = listener;

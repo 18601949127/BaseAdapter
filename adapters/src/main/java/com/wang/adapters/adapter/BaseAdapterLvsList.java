@@ -1,4 +1,4 @@
-package com.wang.mylibrary.adapter;
+package com.wang.adapters.adapter;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -7,11 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wang.mylibrary.R;
-import com.wang.mylibrary.base.BaseViewHolder;
-import com.wang.mylibrary.interfaceabstract.IAdapterList;
-import com.wang.mylibrary.interfaceabstract.IItemClick;
-import com.wang.mylibrary.interfaceabstract.OnItemClickListener;
+import com.wang.adapters.R;
+import com.wang.adapters.base.BaseViewHolder;
+import com.wang.adapters.interfaceabstract.IAdapterList;
+import com.wang.adapters.interfaceabstract.IItemClick;
+import com.wang.adapters.interfaceabstract.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;

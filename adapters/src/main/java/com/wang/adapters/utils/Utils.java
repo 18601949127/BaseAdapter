@@ -1,4 +1,4 @@
-package com.wang.mylibrary.utils;
+package com.wang.adapters.utils;
 
 import java.util.Collection;
 

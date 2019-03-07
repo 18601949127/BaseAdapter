@@ -1,4 +1,4 @@
-package com.wang.mylibrary.adapter;
+package com.wang.adapters.adapter;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
@@ -6,11 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wang.mylibrary.R;
-import com.wang.mylibrary.base.BaseViewHolder;
-import com.wang.mylibrary.interfaceabstract.IAdapter;
-import com.wang.mylibrary.interfaceabstract.IAdapterList;
-import com.wang.mylibrary.interfaceabstract.IItemClick;
+import com.wang.adapters.R;
+import com.wang.adapters.base.BaseViewHolder;
+import com.wang.adapters.interfaceabstract.IAdapter;
+import com.wang.adapters.interfaceabstract.IAdapterList;
+import com.wang.adapters.interfaceabstract.IItemClick;
+import com.wang.adapters.interfaceabstract.OnItemClickListener;
 
 import java.util.List;
 
@@ -89,7 +90,7 @@ public abstract class BaseAdapterRv<VH extends BaseViewHolder> extends RecyclerV
     /**
      * 注意!涉及到notifyItemInserted刷新时立即获取position可能会不正确
      * 里面也有LongClick
-     * 监听事件一般使用实现类{@link com.wang.mylibrary.interfaceabstract.OnItemClickListener}
+     * 监听事件一般使用实现类{@link OnItemClickListener}
      */
     public void setOnItemClickListener(IItemClick listener) {
         mListener = listener;

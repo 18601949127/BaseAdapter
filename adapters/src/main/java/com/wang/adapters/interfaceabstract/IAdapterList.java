@@ -1,4 +1,4 @@
-package com.wang.mylibrary.interfaceabstract;
+package com.wang.adapters.interfaceabstract;
 
 import android.support.annotation.NonNull;
 

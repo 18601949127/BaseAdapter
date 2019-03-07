@@ -1,4 +1,4 @@
-package com.wang.mylibrary.adapter;
+package com.wang.adapters.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

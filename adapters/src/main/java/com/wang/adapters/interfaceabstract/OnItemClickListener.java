@@ -1,10 +1,10 @@
-package com.wang.mylibrary.interfaceabstract;
+package com.wang.adapters.interfaceabstract;
 
 import android.view.View;
 
-import com.wang.mylibrary.R;
-import com.wang.mylibrary.adapter.BaseAdapterRv;
-import com.wang.mylibrary.adapter.BaseAdapterRvList;
+import com.wang.adapters.R;
+import com.wang.adapters.adapter.BaseAdapterRv;
+import com.wang.adapters.adapter.BaseAdapterRvList;
 
 /**
  * 点击,长按,header,footer的回调

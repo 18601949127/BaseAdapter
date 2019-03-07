@@ -15,9 +15,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wang.mylibrary.adapter.BaseAdapterRvList;
-import com.wang.mylibrary.base.BaseViewHolder;
-import com.wang.mylibrary.interfaceabstract.OnItemClickListener;
+import com.wang.adapters.adapter.BaseAdapterRvList;
+import com.wang.adapters.base.BaseViewHolder;
+import com.wang.adapters.interfaceabstract.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
