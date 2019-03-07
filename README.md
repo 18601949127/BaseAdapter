@@ -42,4 +42,4 @@ allprojects {
 }
 ```
 然后导入
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:1.0'`
+`implementation（或api） 'com.github.weimingjue:BaseAdapter:1.01'`
