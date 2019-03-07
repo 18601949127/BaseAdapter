@@ -26,6 +26,25 @@
         }
     }
 ```
+自带点击事件
+```
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            protected void onItemClick(View view, int listPosition) {
+            }
+
+            @Override
+            protected boolean onItemLongClick(View view, int listPosition) {
+                return true;
+            }
+
+            @Override
+            protected void onFooterClick(View view) {
+                super.onFooterClick(view);
+            }
+            ...Header、LongClick等
+        });
+```
 ## 导入方式
 你的build.gradle要有jitpack.io，大致如下
 ```
