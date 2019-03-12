@@ -3,6 +3,7 @@ package com.wang.adapters.adapter;
 import android.app.Activity;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,6 +74,10 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
         return getView(position, convertView, parent);
     }
 
+    /**
+     * 此处是lv用到，list的空判断见{@link IAdapterList#isEmptyArray}
+     */
+    @RequiresApi(999)
     @Override
     public final boolean isEmpty() {
         return getItemCount() == 0;

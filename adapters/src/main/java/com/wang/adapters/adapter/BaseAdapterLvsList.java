@@ -12,8 +12,10 @@ import com.wang.adapters.base.BaseViewHolder;
 import com.wang.adapters.interfaceabstract.IAdapterList;
 import com.wang.adapters.interfaceabstract.IItemClick;
 import com.wang.adapters.interfaceabstract.OnItemClickListener;
+import com.wang.adapters.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -104,6 +106,56 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
         return BaseAdapterRvList.TYPE_BODY;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // list相关的方法，其他方法请使用getList进行操作
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return 注意list是否传了null或者根本没传
+     */
+    @Override
+    public List<BEAN> getList() {
+        return mList;
+    }
+
+    /**
+     * 获取指定bean
+     */
+    @NonNull
+    public BEAN get(int listPosition) {
+        if (mList != null && listPosition < mList.size()) {
+            return mList.get(listPosition);
+        }
+        throw new RuntimeException("lit为空或指针越界");
+    }
+
+    /**
+     * 清空list,不刷新adapter
+     */
+    public void clear() {
+        if (mList != null) mList.clear();
+    }
+
+    /**
+     * 添加全部条目,不刷新adapter
+     */
+    public void addAll(@NonNull Collection<? extends BEAN> addList) {
+        if (mList == null) {
+            mList = new ArrayList<>();
+        }
+        mList.addAll(addList);
+    }
+
+    @Override
+    public int size() {
+        return mList == null ? 0 : mList.size();
+    }
+
+    @Override
+    public boolean isEmptyArray() {
+        return Utils.isEmptyArray(mList);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // 以下是增加的方法
     ///////////////////////////////////////////////////////////////////////////
@@ -135,39 +187,6 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     public void addFooterView(View view) {
         mFooterView = view;
         notifyDataSetChanged();
-    }
-
-    @Override
-    public List<BEAN> getList() {
-        return mList;
-    }
-
-    /**
-     * 获取指定bean
-     */
-    @NonNull
-    public BEAN get(int listPosition) {
-        if (mList != null && listPosition < mList.size()) {
-            return mList.get(listPosition);
-        }
-        throw new RuntimeException("lit为空或指针越界");
-    }
-
-    /**
-     * 清空list,不刷新adapter
-     */
-    public void clear() {
-        if (mList != null) mList.clear();
-    }
-
-    /**
-     * 添加全部条目,不刷新adapter
-     */
-    public void addAll(@NonNull List<BEAN> addList) {
-        if (mList == null) {
-            mList = new ArrayList<>();
-        }
-        mList.addAll(addList);
     }
 
     /**

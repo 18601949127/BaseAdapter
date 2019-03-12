@@ -9,6 +9,7 @@ import com.wang.adapters.interfaceabstract.IAdapterList;
 import com.wang.adapters.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -35,6 +36,13 @@ public abstract class BaseAdapterRvListMaxint<VH extends BaseViewHolder, BEAN> e
         onBindVH(holder, position, mList.get(position));
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // list相关的方法，其他方法请使用getList进行操作
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return 注意list是否传了null或者根本没传
+     */
     @Override
     public List<BEAN> getList() {
         return mList;
@@ -42,12 +50,13 @@ public abstract class BaseAdapterRvListMaxint<VH extends BaseViewHolder, BEAN> e
 
     /**
      * 获取指定bean
-     *
-     * @throws Exception list为空
      */
     @NonNull
     public BEAN get(int listPosition) {
-        return mList.get(listPosition % mList.size());
+        if (mList != null) {
+            return mList.get(listPosition % mList.size());
+        }
+        throw new RuntimeException("lit为空或指针越界");
     }
 
     /**
@@ -60,11 +69,21 @@ public abstract class BaseAdapterRvListMaxint<VH extends BaseViewHolder, BEAN> e
     /**
      * 添加全部条目,不刷新adapter
      */
-    public void addAll(@NonNull List<BEAN> addList) {
+    public void addAll(@NonNull Collection<? extends BEAN> addList) {
         if (mList == null) {
             mList = new ArrayList<>();
         }
         mList.addAll(addList);
+    }
+
+    @Override
+    public int size() {
+        return mList == null ? 0 : mList.size();
+    }
+
+    @Override
+    public boolean isEmptyArray() {
+        return Utils.isEmptyArray(mList);
     }
 
     ///////////////////////////////////////////////////////////////////////////

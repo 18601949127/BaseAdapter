@@ -2,6 +2,7 @@ package com.wang.adapters.interfaceabstract;
 
 import android.support.annotation.NonNull;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -9,9 +10,13 @@ import java.util.List;
  */
 public interface IAdapterList<BEAN> extends IAdapter {
 
-    List<BEAN> getList();
-
     void setListAndNotifyDataSetChanged(List<BEAN> list);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // list相关的方法
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    List<BEAN> getList();
 
     /**
      * 获取指定bean
@@ -27,5 +32,12 @@ public interface IAdapterList<BEAN> extends IAdapter {
     /**
      * 添加全部条目,不刷新adapter
      */
-    void addAll(@NonNull List<BEAN> addList);
+    void addAll(@NonNull Collection<? extends BEAN> addList);
+
+    int size();
+
+    /**
+     * null或空
+     */
+    boolean isEmptyArray();
 }
