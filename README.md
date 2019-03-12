@@ -26,6 +26,25 @@
         }
     }
 ```
+自带点击事件
+```
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            protected void onItemClick(View view, int listPosition) {
+            }
+
+            @Override
+            protected boolean onItemLongClick(View view, int listPosition) {
+                return true;
+            }
+
+            @Override
+            protected void onFooterClick(View view) {
+                super.onFooterClick(view);
+            }
+            ...Header、LongClick等
+        });
+```
 ## 导入方式
 你的build.gradle要有jitpack.io，大致如下
 ```
@@ -42,4 +61,4 @@ allprojects {
 }
 ```
 然后导入
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:1.0'`
+`implementation（或api） 'com.github.weimingjue:BaseAdapter:1.01'`
