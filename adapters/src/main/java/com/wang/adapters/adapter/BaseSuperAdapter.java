@@ -247,7 +247,7 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
         int getItemCount();
 
         @NonNull
-        VH onCreateViewHolder(ViewGroup parent, int viewType, LayoutInflater inflater);
+        VH onCreateViewHolder(ViewGroup parent, int viewType, @NonNull LayoutInflater inflater);
 
         void onBindViewHolder(VH holder, int position);
 

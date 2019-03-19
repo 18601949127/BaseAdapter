@@ -26,14 +26,20 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     public final String TAG = getClass().getSimpleName();
 
     protected final Activity mActivity;
+    /**
+     * 如果{@link #mActivity}是null则也是null
+     */
     protected final LayoutInflater mInflater;
     protected final ViewRecycler<View> mRecycler;
 
     protected IItemClick mListener;
 
-    public BaseAdapterLvs(@NonNull Activity activity) {
+    /**
+     * @param activity 是不是null用的时候自己知道，如果是null则{@link #mInflater}也为null
+     */
+    public BaseAdapterLvs(Activity activity) {
         mActivity = activity;
-        mInflater = LayoutInflater.from(mActivity);
+        mInflater = mActivity == null ? null : LayoutInflater.from(mActivity);
         mRecycler = new ViewRecycler<>();
     }
 
@@ -49,7 +55,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
         VH holder;
         if (convertView == null || convertView.getTag(R.id.tag_view_holder) == null) {
             //模仿recyclerview,除了bind是position外,其他都是viewType
-            holder = onCreateViewHolder(parent, getItemViewType(position), mInflater);
+            holder = onCreateViewHolder(parent, getItemViewType(position), mInflater == null ? LayoutInflater.from(parent.getContext()) : mInflater);
             holder.itemView.setTag(R.id.tag_view_holder, holder);
         } else {
             //noinspection unchecked
@@ -175,7 +181,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
 
     protected abstract void onBindViewHolder(VH holder, int position);
 
-    protected abstract VH onCreateViewHolder(ViewGroup parent, int itemViewType, LayoutInflater inflater);
+    protected abstract VH onCreateViewHolder(ViewGroup parent, int itemViewType, @NonNull LayoutInflater inflater);
 
     /**
      * 这里的点击事件不会因有checkbox而被抢焦点

@@ -27,15 +27,18 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
 
     public View mHeaderView, mFooterView;
 
-    public BaseAdapterLvsList(@NonNull Activity activity) {
-        super(activity);
+    public BaseAdapterLvsList(Activity activity) {
+        this(activity, null, null, null);
     }
 
-    public BaseAdapterLvsList(@NonNull Activity activity, @Nullable List<BEAN> list) {
-        super(activity);
-        mList = list;
+    public BaseAdapterLvsList(Activity activity, @Nullable List<BEAN> list) {
+        this(activity, list, null, null);
     }
 
+    /**
+     * @param activity 是不是null用的时候自己知道，如果是null则{@link #mInflater}也为null
+     * @param list     是不是null用的时候自己知道
+     */
     public BaseAdapterLvsList(Activity activity, List<BEAN> list, @Nullable View headerView, @Nullable View footerView) {
         super(activity);
         mList = list;

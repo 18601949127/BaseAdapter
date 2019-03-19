@@ -23,17 +23,23 @@ public abstract class BaseAdapterRv<VH extends BaseViewHolder> extends RecyclerV
     public final String TAG = getClass().getSimpleName();
 
     protected final Activity mActivity;
+    /**
+     * 如果{@link #mActivity}是null则也是null
+     */
     protected final LayoutInflater mInflater;
     protected IItemClick mListener;
 
+    /**
+     * @param activity 是不是null用的时候自己知道，如果是null则{@link #mInflater}也为null
+     */
     public BaseAdapterRv(Activity activity) {
         mActivity = activity;
-        mInflater = LayoutInflater.from(mActivity);
+        mInflater = mActivity == null ? null : LayoutInflater.from(mActivity);
     }
 
     @Override
     public final VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        VH holder = onCreateViewHolder(parent, viewType, mInflater);
+        VH holder = onCreateViewHolder(parent, viewType, mInflater == null ? LayoutInflater.from(parent.getContext()) : mInflater);
         //保存holder，如果position无法解决问题，可以使用这个
         holder.itemView.setTag(R.id.tag_view_holder, holder);
         return holder;

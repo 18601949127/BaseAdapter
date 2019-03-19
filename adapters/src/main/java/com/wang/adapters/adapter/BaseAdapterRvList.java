@@ -2,6 +2,7 @@ package com.wang.adapters.adapter;
 
 import android.app.Activity;
 import android.support.annotation.IntDef;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -43,15 +44,18 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
     public @interface AdapterListType {
     }//该变量只能传入上面几种,否则会报错
 
-    public BaseAdapterRvList(@NonNull Activity activity) {
-        super(activity);
+    public BaseAdapterRvList(Activity activity) {
+        this(activity, null, null, null);
     }
 
-    public BaseAdapterRvList(@NonNull Activity activity, @Nullable List<BEAN> list) {
-        super(activity);
-        mList = list;
+    public BaseAdapterRvList(Activity activity, @Nullable List<BEAN> list) {
+        this(activity, list, null, null);
     }
 
+    /**
+     * @param activity 是不是null用的时候自己知道，如果是null则{@link #mInflater}也为null
+     * @param list     是不是null用的时候自己知道
+     */
     public BaseAdapterRvList(Activity activity, List<BEAN> list, @Nullable View headerView, @Nullable View footerView) {
         super(activity);
         mList = list;
@@ -228,5 +232,42 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
     @Override
     public void setOnItemClickListener(IItemClick listener) {
         super.setOnItemClickListener(listener);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 追加一个懒汉写法
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 懒得不能再懒了的写法
+     * adapter里的Activity为null
+     *
+     * @param layouId  creat时的资源id
+     * @param listener 当bind时回调
+     * @param <BEAN>   list数据的bean
+     */
+    public static <BEAN> BaseAdapterRvList<BaseViewHolder, BEAN> createAdapter
+    (@LayoutRes final int layouId, final OnAdapterBindListener<BEAN> listener) {
+        return createAdapter(null, null, layouId, listener);
+    }
+
+    public static <BEAN> BaseAdapterRvList<BaseViewHolder, BEAN> createAdapter
+            (@Nullable Activity activity, @Nullable List<BEAN> list, @LayoutRes final int layouId, final OnAdapterBindListener<BEAN> listener) {
+        return new BaseAdapterRvList<BaseViewHolder, BEAN>(activity, list) {
+            @Override
+            protected void onBindVH(BaseViewHolder holder, int listPosition, BEAN bean) {
+                listener.onBindVH(holder, listPosition, bean);
+            }
+
+            @NonNull
+            @Override
+            protected BaseViewHolder onCreateVH(ViewGroup parent, LayoutInflater inflater) {
+                return new BaseViewHolder(parent, layouId, inflater);
+            }
+        };
+    }
+
+    public interface OnAdapterBindListener<BEAN> {
+        void onBindVH(BaseViewHolder holder, int listPosition, BEAN bean);
     }
 }
