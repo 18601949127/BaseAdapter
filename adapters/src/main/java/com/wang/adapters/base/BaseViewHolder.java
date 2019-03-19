@@ -2,6 +2,7 @@ package com.wang.adapters.base;
 
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
+import android.support.annotation.IntDef;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * 所有ViewHolder的基类
@@ -43,7 +47,7 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         View view = mViews.get(resId);
         if (view == null) {
             view = itemView.findViewById(resId);
-            this.mViews.put(resId, view);
+            mViews.put(resId, view);
         }
         //noinspection unchecked
         return (T) view;
@@ -73,8 +77,16 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
     }
 
     //控件是否显示
-    public BaseViewHolder setViewVisible(@IdRes int resId, int visible) {
+    public BaseViewHolder setViewVisible(@IdRes int resId, @ViewVisibility int visible) {
         getView(resId).setVisibility(visible);
         return this;
+    }
+
+    /**
+     * view的被hide了
+     */
+    @IntDef({View.VISIBLE, View.INVISIBLE, View.GONE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ViewVisibility {
     }
 }
