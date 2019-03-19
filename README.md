@@ -11,18 +11,14 @@
 
         @Override
         protected void onBindVH(BaseViewHolder holder, int listPosition, String s) {
-            TextView tv = (TextView) holder.itemView;
-            tv.setText(s);
+            //当然，你也可以继承BaseViewHolder自己用黄油刀生成
+            holder.setText(R.id.text, s).setViewVisible(R.id.text, s == null ? View.GONE : View.VISIBLE);
         }
 
         @NonNull
         @Override
         protected BaseViewHolder onCreateVH(ViewGroup parent, LayoutInflater inflater) {
-            TextView tv = new AppCompatTextView(mActivity);
-            tv.setTextSize(20);
-            tv.setTextColor(0xff000000);
-            tv.setPadding(20, 20, 20, 20);
-            return new BaseViewHolder(tv);
+            return new BaseViewHolder(parent,R.layout.adapter);
         }
     }
 ```
@@ -45,6 +41,11 @@
             ...Header、LongClick等
         });
 ```
+自带header、footer
+```
+        adapter.addHeaderView(view);
+        adapter.addFooterView(view);
+```
 ## 导入方式
 你的build.gradle要有jitpack.io，大致如下
 ```
@@ -61,4 +62,4 @@ allprojects {
 }
 ```
 然后导入
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:1.01'`
+`implementation（或api） 'com.github.weimingjue:BaseAdapter:V1.02'`
