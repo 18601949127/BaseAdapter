@@ -91,13 +91,14 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
                 onBindVH((VH) holder, position, mList.get(position));
                 break;
             default:
-                throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterRV");
+                throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterRv");
         }
     }
 
     @NonNull
     @Override
-    public final BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType, LayoutInflater inflater) {
+    public final BaseViewHolder onCreateViewHolder(ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType,
+                                                   LayoutInflater inflater) {
         switch (viewType) {
             case TYPE_HEADER:
                 return new BaseViewHolder(mHeaderView);
@@ -106,7 +107,7 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
             case TYPE_BODY:
                 return onCreateVH(parent, inflater);
             default:
-                throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterRV");
+                throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterRv");
         }
     }
 

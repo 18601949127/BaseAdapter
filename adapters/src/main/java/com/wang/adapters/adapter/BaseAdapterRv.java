@@ -33,11 +33,15 @@ public abstract class BaseAdapterRv<VH extends BaseViewHolder> extends RecyclerV
 
     @Override
     public final VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        return onCreateViewHolder(parent, viewType, mInflater);
+        VH holder = onCreateViewHolder(parent, viewType, mInflater);
+        //保存holder，如果position无法解决问题，可以使用这个
+        holder.itemView.setTag(R.id.tag_view_holder, holder);
+        return holder;
     }
 
     @Override
     public final void onBindViewHolder(VH holder, int position) {
+        //保存position
         holder.itemView.setTag(R.id.tag_view_click, position);
         //创建点击事件
         holder.itemView.setOnClickListener(mListener);

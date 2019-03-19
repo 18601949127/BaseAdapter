@@ -5,6 +5,7 @@ import android.view.View;
 import com.wang.adapters.R;
 import com.wang.adapters.adapter.BaseAdapterRv;
 import com.wang.adapters.adapter.BaseAdapterRvList;
+import com.wang.adapters.base.BaseViewHolder;
 
 /**
  * 点击,长按,header,footer的回调
@@ -16,7 +17,7 @@ import com.wang.adapters.adapter.BaseAdapterRvList;
 public abstract class OnItemClickListener implements IItemClick {
     @Override
     public final void onClick(View view) {
-        int position = (Integer) view.getTag(R.id.tag_view_click);
+        int position = getViewPosition(view);
         switch (position) {
             case BaseAdapterRvList.POSITION_HEADER:
                 onHeaderClick(view);
@@ -32,7 +33,7 @@ public abstract class OnItemClickListener implements IItemClick {
 
     @Override
     public final boolean onLongClick(View view) {
-        int position = (Integer) view.getTag(R.id.tag_view_click);
+        int position = getViewPosition(view);
         switch (position) {
             case BaseAdapterRvList.POSITION_HEADER:
                 return onHeaderLongClick(view);
@@ -41,6 +42,20 @@ public abstract class OnItemClickListener implements IItemClick {
             default:
                 return onItemLongClick(view, position);
         }
+    }
+
+    /**
+     * 获取当前view所保存的position
+     */
+    protected final int getViewPosition(View view) {
+        return (int) view.getTag(R.id.tag_view_click);
+    }
+
+    /**
+     * 获取当前view所在的ViewHolder
+     */
+    protected final BaseViewHolder getViewHolder(View view) {
+        return (BaseViewHolder) view.getTag(R.id.tag_view_holder);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
