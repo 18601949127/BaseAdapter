@@ -46,20 +46,29 @@
         adapter.addHeaderView(view);
         adapter.addFooterView(view);
 ```
+懒人专属
+```
+BaseAdapterRvList<BaseViewHolder, String> adapter = BaseAdapterRvList.createAdapter(R.layout.adapter, new OnAdapterBindListener<String>() {
+    @Override
+    public void onBindVH(BaseViewHolder holder, int listPosition, String s) {
+        holder.setText(R.id.text, s);
+    }
+});
+mRv.setAdapter(adapter);
+//...刷新数据时
+adapter.setListAndNotifyDataSetChanged(list);
+```
 ## 导入方式
 你的build.gradle要有jitpack.io，大致如下
 ```
 allprojects {
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'https://jitpack.io' }
+        google()
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
-        maven {
-            url "https://jitpack.io"
-        }
     }
 }
 ```
 然后导入
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:V1.02'`
+`implementation（或api） 'com.github.weimingjue:BaseAdapter:V1.03'`
