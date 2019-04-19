@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.wang.adapters.R;
+import com.zhy.view.flowlayout.FlowLayout;
 
 /**
  * 高级功能:adapter套adapter的点击事件,具体用法见实现类
@@ -87,7 +88,7 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
         while (parent != null) {
             //第二层不建议使用listview或gridview(肯定没有复用性,并且效率很差,可以尝试使用recyclerview然后wrap)
 //            if (parent instanceof RecyclerView || parent instanceof ViewPager || parent instanceof FlowLayout || parent instanceof AdapterView) {
-            if (parent instanceof RecyclerView || parent instanceof ViewPager) {
+            if (parent instanceof RecyclerView || parent instanceof ViewPager || parent instanceof FlowLayout) {
                 return (Integer) ((ViewGroup) parent).getTag(R.id.tag_view_click);
             }
             parent = parent.getParent();
