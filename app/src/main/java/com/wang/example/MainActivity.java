@@ -1,6 +1,7 @@
 package com.wang.example;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,8 +30,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRv = new RecyclerView(this);
-        setContentView(mRv, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setContentView(R.layout.activity_main);
+        findViewById(R.id.tv_main_vp).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(ViewPagerFragActivity.class);
+            }
+        });
+        mRv = findViewById(R.id.rv_main);
         listTest();
     }
 
@@ -101,5 +108,9 @@ public class MainActivity extends AppCompatActivity {
             tv.setPadding(20, 20, 20, 20);
             return new BaseViewHolder(tv);
         }
+    }
+
+    public void startActivity(Class c) {
+        startActivity(new Intent(this, c));
     }
 }

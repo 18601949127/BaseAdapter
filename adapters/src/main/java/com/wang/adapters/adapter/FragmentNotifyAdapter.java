@@ -2,6 +2,7 @@ package com.wang.adapters.adapter;
 
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -143,51 +144,50 @@ public final class FragmentNotifyAdapter extends PagerAdapter {
         return mNoDestroyPosition;
     }
 
+    /**
+     * 调用这个和{@link BaseAdapterVpFrag}没什么区别，已经加载的frag不会发生任何变化
+     * 请使用{@link #notifyAllItem}
+     */
+    @RequiresApi(999)
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // 以下是自定义方法
     ///////////////////////////////////////////////////////////////////////////
 
     public FragmentNotifyAdapter addFragment(Fragment... frags) {
         Collections.addAll(mFragments, frags);
+        super.notifyDataSetChanged();//添加不会有问题
         return this;
     }
 
     public FragmentNotifyAdapter addFragment(List<? extends Fragment> frags) {
         mFragments.addAll(frags);
-        notifyDataSetChanged();
-        return this;
-    }
-
-    public ArrayList<Fragment> getFragments() {
-        return mFragments;
-    }
-
-    public FragmentNotifyAdapter removeFragnemt(Fragment frag) {
-        return removeFragnemt(mFragments.indexOf(frag));
-    }
-
-    public FragmentNotifyAdapter removeFragnemt(int position) {
-        if (position > -1 && position < mFragments.size()) {
-            mFragments.remove(position);
-            notifyDataSetChanged();
-        }
-        return this;
-    }
-
-    public FragmentNotifyAdapter removeAllFragnemt() {
-        mFragments.clear();
-        notifyDataSetChanged();
-        return this;
-    }
-
-    public FragmentNotifyAdapter setTitles(ArrayList<? extends CharSequence> titles) {
-        mTitles = titles;
-        notifyDataSetChanged();
+        super.notifyDataSetChanged();//添加不会有问题
         return this;
     }
 
     /**
-     * 这个方法会重新刷新视图
+     * 删除相关操作请使用{@link #getFragments}{@link #notifyAllItem}来解决白屏问题
+     */
+    public ArrayList<Fragment> getFragments() {
+        return mFragments;
+    }
+
+    /**
+     * 添加frag的title，类似TabLayout可能会用到
+     */
+    public FragmentNotifyAdapter setTitles(ArrayList<? extends CharSequence> titles) {
+        mTitles = titles;
+        super.notifyDataSetChanged();
+        return this;
+    }
+
+    /**
+     * 这个方法会重新加载视图
      *
      * @param noDestroyPosition 不需要重新绑定的frag(你代码复用了这个frag)(删除再添加会白屏,保留一个不删除比较友好)
      */
@@ -197,8 +197,8 @@ public final class FragmentNotifyAdapter extends PagerAdapter {
         } else {
             mNoDestroyPosition = POSITION_NONE;
         }
-        notifyDataSetChanged();
+        super.notifyDataSetChanged();
         mNoDestroyPosition = POSITION_UNCHANGED;
-        notifyDataSetChanged();
+        super.notifyDataSetChanged();
     }
 }

@@ -84,6 +84,9 @@ public final class BaseAdapterVpStateFrag extends FragmentStatePagerAdapter {
         return PagerAdapter.POSITION_NONE;
     }
 
+    /**
+     * 添加frag的title，类似TabLayout可能会用到
+     */
     public BaseAdapterVpStateFrag setTitles(ArrayList<? extends CharSequence> titles) {
         mTitles = titles;
         notifyDataSetChanged();

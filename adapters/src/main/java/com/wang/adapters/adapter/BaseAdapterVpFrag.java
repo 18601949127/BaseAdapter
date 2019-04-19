@@ -42,25 +42,6 @@ public final class BaseAdapterVpFrag extends FragmentPagerAdapter {
         return this;
     }
 
-//    刷新frag集合的方式不能删除frag
-//    public BaseAdapterVpFrag removeFragnemt(Fragment frag) {
-//        return removeFragnemt(mFragments.indexOf(frag));
-//    }
-//
-//    public BaseAdapterVpFrag removeFragnemt(int position) {
-//        if (position > -1 && position < mFragments.size()) {
-//            mFragments.remove(position);
-//            notifyDataSetChanged();
-//        }
-//        return this;
-//    }
-//
-//    public BaseAdapterVpFrag removeAllFragnemt() {
-//        mFragments.clear();
-//        notifyDataSetChanged();
-//        return this;
-//    }
-
     @Override
     public Fragment getItem(int position) {
         //得到对应position的Fragment
@@ -73,6 +54,9 @@ public final class BaseAdapterVpFrag extends FragmentPagerAdapter {
         return mFragments.size();
     }
 
+    /**
+     * 添加frag的title，类似TabLayout可能会用到
+     */
     public BaseAdapterVpFrag setTitles(ArrayList<? extends CharSequence> titles) {
         mTitles = titles;
         notifyDataSetChanged();
