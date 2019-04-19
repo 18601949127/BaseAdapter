@@ -58,6 +58,20 @@ mRv.setAdapter(adapter);
 //...刷新数据时
 adapter.setListAndNotifyDataSetChanged(list);
 ```
+ViewPager的Fragment更简单
+```
+mVp.setAdapter(new BaseAdapterVpFrag(getSupportFragmentManager(), mFrags));
+//或
+mVp.setAdapter(new BaseAdapterVpFrag(getSupportFragmentManager(), frag1,frag2...));
+//动态修改frag
+mVp.setAdapter(new BaseAdapterVpStateFrag(getSupportFragmentManager(), mFrags));
+//解决动态修改刷新白屏的问题
+        FragmentNotifyAdapter adapter = new FragmentNotifyAdapter(getSupportFragmentManager(), mFrags);
+        mVp.setAdapter(adapter);
+        ...
+        adapter.notifyAllItem(1);//保留展示在界面上的那个这样就不会白屏了，想要刷新保留的frag当然需要自己实现了
+```
+
 ## 导入方式
 你的build.gradle要有jitpack.io，大致如下
 ```
