@@ -74,7 +74,7 @@ mVp.setAdapter(new BaseAdapterVpFrag(getSupportFragmentManager(), frag1,frag2...
         FragmentNotifyAdapter adapter = new FragmentNotifyAdapter(getSupportFragmentManager(), mFrags);
         mVp.setAdapter(adapter);
         ...
-        adapter.notifyAllItem(1);//保留展示在界面上的那个这样就不会白屏了，想要刷新保留的frag当然需要自己实现了
+        adapter.notifyAllItem(1);//保留展示在界面上的那个这样就不会白屏了，想要刷新保留的frag当然需要自己实现了，详见app下的示例
 ```
 
 ## 导入方式
