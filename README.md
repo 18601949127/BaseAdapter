@@ -67,8 +67,8 @@ mVp.setAdapter(new BaseAdapterVpFrag(getSupportFragmentManager(), frag1,frag2...
         mAdapter = new BaseAdapterVpStateFrag(getSupportFragmentManager(), mFrags);
         mVp.setAdapter(mAdapter);
         ...
-        mFrags.add(xxx);
-        mFrags.remove(yyy);
+        mAdapter.getFragments().add(xxx);//由于内部有新的list，所以并不能用自己的mFrags
+        mAdapter.getFragments().remove(yyy);
         mAdapter.notifyDataSetChanged();
 //解决动态修改刷新白屏的问题
         FragmentNotifyAdapter adapter = new FragmentNotifyAdapter(getSupportFragmentManager(), mFrags);
