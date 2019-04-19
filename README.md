@@ -64,7 +64,12 @@ mVp.setAdapter(new BaseAdapterVpFrag(getSupportFragmentManager(), mFrags));
 //或
 mVp.setAdapter(new BaseAdapterVpFrag(getSupportFragmentManager(), frag1,frag2...));
 //动态修改frag
-mVp.setAdapter(new BaseAdapterVpStateFrag(getSupportFragmentManager(), mFrags));
+        mAdapter = new BaseAdapterVpStateFrag(getSupportFragmentManager(), mFrags);
+        mVp.setAdapter(mAdapter);
+        ...
+        mFrags.add(xxx);
+        mFrags.remove(yyy);
+        mAdapter.notifyDataSetChanged();
 //解决动态修改刷新白屏的问题
         FragmentNotifyAdapter adapter = new FragmentNotifyAdapter(getSupportFragmentManager(), mFrags);
         mVp.setAdapter(adapter);
