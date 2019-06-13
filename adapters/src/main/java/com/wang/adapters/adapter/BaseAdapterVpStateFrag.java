@@ -1,5 +1,6 @@
 package com.wang.adapters.adapter;
 
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,6 +21,8 @@ public final class BaseAdapterVpStateFrag extends FragmentStatePagerAdapter {
     private final ArrayList<Fragment> mFragments = new ArrayList<>();//添加的Fragment的集合
 
     private List<? extends CharSequence> mTitles;//tabLayout总是取title
+
+    private boolean mIsSaveState = true;
 
     public BaseAdapterVpStateFrag(FragmentManager fm, Fragment... frags) {
         super(fm);
@@ -99,5 +102,21 @@ public final class BaseAdapterVpStateFrag extends FragmentStatePagerAdapter {
             return mTitles.get(position);
 
         return null;
+    }
+
+    /**
+     * 不缓存所有frag
+     * 简单的讲就是里面的frag可以使用构造传参，不存在重建构造错误的问题
+     * 解决的问题：frag需要bundle不能传的东西（如：activity、frag）
+     */
+    public BaseAdapterVpStateFrag noSaveState() {
+        mIsSaveState = false;
+        return this;
+    }
+
+    //直接不保存，这样就不会有缓存了
+    @Override
+    public Parcelable saveState() {
+        return mIsSaveState ? super.saveState() : null;
     }
 }
