@@ -2,7 +2,7 @@
 *.bat
 *.apk
 *.zip
-*.properties
+local.properties
 *.hprof
 /captures
 ~$*
