@@ -1,10 +1,12 @@
-package com.wang.adapters.interfaceabstract;
+package com.wang.adapters.interfaces;
 
-import androidx.viewpager.widget.ViewPager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.wang.adapters.R;
 import com.zhy.view.flowlayout.FlowLayout;
@@ -14,14 +16,14 @@ import com.zhy.view.flowlayout.FlowLayout;
  * //bind直接使用adapter的mListener即可
  * adapter.setOnItemClickListener(mListener);
  * <p>
- * //creat里面写法
+ * //create里面写法
  * OrderSunListAdapter adapter = (OrderSunListAdapter) holder.mRv.getAdapter();
  * adapter.setListAndNotifyDataSetChanged(orderBean.getListOrderDetail());
  * holder.mRv.setTag(R.id.tag_view_click,position);
  */
 public abstract class OnItemItemClickListener extends OnItemClickListener {
     @Override
-    protected final void onItemClick(View view, int listPosition) {
+    public final void onItemClick(@NonNull View view, int listPosition) {
         Integer parentOrNull = getParentTag(view);
         if (parentOrNull == null) {
             onParentItemClick(view, listPosition);
@@ -31,7 +33,7 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
     }
 
     @Override
-    protected final boolean onItemLongClick(View view, int listPosition) {
+    public final boolean onItemLongClick(@NonNull View view, int listPosition) {
         Integer parentOrNull = getParentTag(view);
         if (parentOrNull == null) {
             return onParentItemLongClick(view, listPosition);
@@ -41,7 +43,7 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
     }
 
     @Override
-    protected final void onHeaderClick(View view) {
+    protected final void onHeaderClick(@NonNull View view) {
         Integer parentOrNull = getParentTag(view);
         if (parentOrNull == null) {
             onParentHeaderClick(view);
@@ -51,7 +53,7 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
     }
 
     @Override
-    protected final boolean onHeaderLongClick(View view) {
+    protected final boolean onHeaderLongClick(@NonNull View view) {
         Integer parentOrNull = getParentTag(view);
         if (parentOrNull == null) {
             return onParentHeaderLongClick(view);
@@ -61,7 +63,7 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
     }
 
     @Override
-    protected final void onFooterClick(View view) {
+    protected final void onFooterClick(@NonNull View view) {
         Integer parentOrNull = getParentTag(view);
         if (parentOrNull == null) {
             onParentFooterClick(view);
@@ -71,7 +73,7 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
     }
 
     @Override
-    protected final boolean onFooterLongClick(View view) {
+    protected final boolean onFooterLongClick(@NonNull View view) {
         Integer parentOrNull = getParentTag(view);
         if (parentOrNull == null) {
             return onParentFooterLongClick(view);
@@ -83,10 +85,10 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
     /**
      * 外层的position需要遍历
      */
-    protected final Integer getParentTag(View v) {
+    protected final Integer getParentTag(@NonNull View v) {
         ViewParent parent = v.getParent();
         while (parent != null) {
-            //第二层不建议使用listview或gridview(肯定没有复用性,并且效率很差,可以尝试使用recyclerview然后wrap)
+            //第二层不建议使用ListView或GridView(肯定没有复用性,并且效率很差,可以尝试使用RecyclerView然后wrap)
 //            if (parent instanceof RecyclerView || parent instanceof ViewPager || parent instanceof FlowLayout || parent instanceof AdapterView) {
             if (parent instanceof RecyclerView || parent instanceof ViewPager || parent instanceof FlowLayout) {
                 return (Integer) ((ViewGroup) parent).getTag(R.id.tag_view_click);
@@ -106,28 +108,28 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
      *
      * @param parentPosition 外层adapter的position
      */
-    protected abstract void onParentItemClick(View view, int parentPosition);
+    protected abstract void onParentItemClick(@NonNull View view, int parentPosition);
 
     /**
      * 当外层被长按时
      *
      * @param parentPosition 外层adapter的position
      */
-    protected boolean onParentItemLongClick(View view, int parentPosition) {
+    protected boolean onParentItemLongClick(@NonNull View view, int parentPosition) {
         return false;
     }
 
-    protected void onParentHeaderClick(View view) {
+    protected void onParentHeaderClick(@NonNull View view) {
     }
 
-    protected boolean onParentHeaderLongClick(View view) {
+    protected boolean onParentHeaderLongClick(@NonNull View view) {
         return false;
     }
 
-    protected void onParentFooterClick(View view) {
+    protected void onParentFooterClick(@NonNull View view) {
     }
 
-    protected boolean onParentFooterLongClick(View view) {
+    protected boolean onParentFooterLongClick(@NonNull View view) {
         return false;
     }
 
@@ -141,7 +143,7 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
      * @param parentPosition 外层adapter对应的position
      * @param childPosition  内层adapter对应的position
      */
-    protected abstract void onChildItemClick(View view, int parentPosition, int childPosition);
+    protected abstract void onChildItemClick(@NonNull View view, int parentPosition, int childPosition);
 
     /**
      * 当内层被长按时
@@ -149,21 +151,21 @@ public abstract class OnItemItemClickListener extends OnItemClickListener {
      * @param parentPosition 外层adapter对应的position
      * @param childPosition  内层adapter对应的position
      */
-    protected boolean onChildItemLongClick(View view, int parentPosition, int childPosition) {
+    protected boolean onChildItemLongClick(@NonNull View view, int parentPosition, int childPosition) {
         return false;
     }
 
-    protected void onChildHeaderClick(View view, int parentPosition) {
+    protected void onChildHeaderClick(@NonNull View view, int parentPosition) {
     }
 
-    protected boolean onChildHeaderLongClick(View view, int parentPosition) {
+    protected boolean onChildHeaderLongClick(@NonNull View view, int parentPosition) {
         return false;
     }
 
-    protected void onChildFooterClick(View view, int parentPosition) {
+    protected void onChildFooterClick(@NonNull View view, int parentPosition) {
     }
 
-    protected boolean onChildFooterLongClick(View view, int parentPosition) {
+    protected boolean onChildFooterLongClick(@NonNull View view, int parentPosition) {
         return false;
     }
 }

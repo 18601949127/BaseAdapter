@@ -1,8 +1,12 @@
 package com.wang.example;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,15 +14,10 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wang.adapters.adapter.BaseAdapterRvList;
-import com.wang.adapters.base.BaseViewHolder;
-import com.wang.adapters.interfaceabstract.OnItemClickListener;
+import com.wang.adapters.adapter.BaseViewHolder;
+import com.wang.adapters.interfaces.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,23 +50,23 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 200; i++) {
             list.add("第" + i);
         }
-        ListAdapter adapter = new ListAdapter(this, list);
+        ListAdapter adapter = new ListAdapter(list);
         mRv.setAdapter(adapter);
         //设置点击事件
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            protected void onItemClick(View view, int listPosition) {
+            public void onItemClick(@NonNull View view, int listPosition) {
                 Toast.makeText(MainActivity.this, "点击第" + list.get(listPosition), Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            protected boolean onItemLongClick(View view, int listPosition) {
+            public boolean onItemLongClick(@NonNull View view, int listPosition) {
                 Toast.makeText(MainActivity.this, "长按第" + list.get(listPosition), Toast.LENGTH_SHORT).show();
                 return true;
             }
 
             @Override
-            protected void onFooterClick(View view) {
+            protected void onFooterClick(@NonNull View view) {
                 super.onFooterClick(view);
                 Toast.makeText(MainActivity.this, "footer被点击", Toast.LENGTH_SHORT).show();
             }
@@ -76,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         AppCompatImageView iv = new AppCompatImageView(this);
         iv.setImageResource(R.mipmap.ic_launcher);
         iv.setAdjustViewBounds(true);
-        adapter.addFooterView(iv);
+        adapter.setFooterView(iv);
         //GridLayoutManager需要将头或尾占多行
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -87,26 +86,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class ListAdapter extends BaseAdapterRvList<BaseViewHolder, String> {
+    public static class ListAdapter extends BaseAdapterRvList<BaseViewHolder, String> {
 
-        public ListAdapter(@NonNull Activity activity, List<String> list) {
-            super(activity, list);
-        }
-
-        @Override
-        protected void onBindVH(BaseViewHolder holder, int listPosition, String s) {
-            TextView tv = (TextView) holder.itemView;
-            tv.setText(s);
+        ListAdapter(List<String> list) {
+            super(list);
         }
 
         @NonNull
         @Override
-        protected BaseViewHolder onCreateVH(ViewGroup parent, LayoutInflater inflater) {
-            TextView tv = new AppCompatTextView(mActivity);
+        protected BaseViewHolder onCreateViewHolder3(ViewGroup parent) {
+            TextView tv = new AppCompatTextView(parent.getContext());
             tv.setTextSize(20);
             tv.setTextColor(0xff000000);
             tv.setPadding(20, 20, 20, 20);
             return new BaseViewHolder(tv);
+        }
+
+        @Override
+        protected void onBindViewHolder3(BaseViewHolder holder, int listPosition, String s) {
+            TextView tv = (TextView) holder.itemView;
+            tv.setText(s);
         }
     }
 

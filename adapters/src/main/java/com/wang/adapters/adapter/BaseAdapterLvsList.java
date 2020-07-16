@@ -1,47 +1,43 @@
 package com.wang.adapters.adapter;
 
-import android.app.Activity;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.wang.adapters.R;
-import com.wang.adapters.base.BaseViewHolder;
-import com.wang.adapters.interfaceabstract.IAdapterList;
-import com.wang.adapters.interfaceabstract.IItemClick;
-import com.wang.adapters.interfaceabstract.OnItemClickListener;
-import com.wang.adapters.utils.Utils;
+import com.wang.adapters.interfaces.IAdapterItemClick;
+import com.wang.adapters.interfaces.OnItemClickListener;
+import com.wang.container.interfaces.IListAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * 和{@link BaseAdapterRvList}基本一致，适用于listview、gridview、viewpager
+ * 和{@link BaseAdapterRvList}基本一致，适用于listView、gridView、viewPager
  */
-public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<BaseViewHolder> implements IAdapterList<BEAN> {
+public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<BaseViewHolder> implements IListAdapter<BEAN, BaseViewHolder, IAdapterItemClick> {
 
-    protected List<BEAN> mList;
+    @NonNull
+    private List<BEAN> mList;
 
     public View mHeaderView, mFooterView;
 
-    public BaseAdapterLvsList(Activity activity) {
-        this(activity, null, null, null);
+    public BaseAdapterLvsList() {
+        this(null);
     }
 
-    public BaseAdapterLvsList(Activity activity, @Nullable List<BEAN> list) {
-        this(activity, list, null, null);
+    public BaseAdapterLvsList(@Nullable List<BEAN> list) {
+        this(list, null, null);
     }
 
     /**
-     * @param activity 是不是null用的时候自己知道，如果是null则{@link #mInflater}也为null
-     * @param list     是不是null用的时候自己知道
+     * @param list 内部维护了list，可以传null
      */
-    public BaseAdapterLvsList(Activity activity, List<BEAN> list, @Nullable View headerView, @Nullable View footerView) {
-        super(activity);
-        mList = list;
+    public BaseAdapterLvsList(@Nullable List<BEAN> list, @Nullable View headerView, @Nullable View footerView) {
+        mList = list == null ? new ArrayList<>() : list;
         mHeaderView = headerView;
         mFooterView = footerView;
     }
@@ -55,9 +51,7 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
         if (mFooterView != null) {
             count++;
         }
-        if (mList != null) {
-            count += mList.size();
-        }
+        count += mList.size();
         return count;
     }
 
@@ -75,7 +69,8 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
                     position--;
                 }
                 holder.itemView.setTag(R.id.tag_view_click, position);
-                onBindVH((VH) holder, position, mList.get(position));
+                //noinspection unchecked
+                onBindViewHolder2((VH) holder, position, mList.get(position));
                 break;
             default:
                 throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterLvs");
@@ -84,15 +79,14 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
 
     @NonNull
     @Override
-    public final BaseViewHolder onCreateViewHolder(ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType,
-                                                   LayoutInflater inflater) {
+    public final BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
         switch (viewType) {
             case BaseAdapterRvList.TYPE_HEADER:
                 return new BaseViewHolder(mHeaderView);
             case BaseAdapterRvList.TYPE_FOOTER:
                 return new BaseViewHolder(mFooterView);
             case BaseAdapterRvList.TYPE_BODY:
-                return onCreateVH(parent, inflater);
+                return onCreateViewHolder2(parent);
             default:
                 throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterLvs");
         }
@@ -117,6 +111,7 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     /**
      * @return 注意list是否传了null或者根本没传
      */
+    @NonNull
     @Override
     public List<BEAN> getList() {
         return mList;
@@ -127,7 +122,7 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
      */
     @NonNull
     public BEAN get(int listPosition) {
-        if (mList != null && listPosition < mList.size()) {
+        if (listPosition < mList.size()) {
             return mList.get(listPosition);
         }
         throw new RuntimeException("lit为空或指针越界");
@@ -137,27 +132,26 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
      * 清空list,不刷新adapter
      */
     public void clear() {
-        if (mList != null) mList.clear();
+        mList.clear();
     }
 
     /**
      * 添加全部条目,不刷新adapter
      */
-    public void addAll(@NonNull Collection<? extends BEAN> addList) {
-        if (mList == null) {
-            mList = new ArrayList<>();
+    public void addAll(@Nullable Collection<? extends BEAN> addList) {
+        if (addList != null) {
+            mList.addAll(addList);
         }
-        mList.addAll(addList);
     }
 
     @Override
     public int size() {
-        return mList == null ? 0 : mList.size();
+        return mList.size();
     }
 
     @Override
-    public boolean isEmptyArray() {
-        return Utils.isEmptyArray(mList);
+    public boolean isEmptyList() {
+        return mList.isEmpty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -167,20 +161,20 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     /**
      * @param listPosition 已经做过处理,就是list的position
      */
-    protected abstract void onBindVH(VH holder, int listPosition, BEAN bean);
+    protected abstract void onBindViewHolder2(VH holder, int listPosition, BEAN bean);
 
     @NonNull
-    protected abstract VH onCreateVH(ViewGroup parent, LayoutInflater inflater);
+    protected abstract VH onCreateViewHolder2(ViewGroup parent);
 
-    public void setListAndNotifyDataSetChanged(List<BEAN> list) {
-        mList = list;
+    public void setListAndNotifyDataSetChanged(@Nullable List<BEAN> list) {
+        mList = list == null ? new ArrayList<>() : list;
         notifyDataSetChanged();
     }
 
     /**
      * add null表示删除
      */
-    public void addHeaderView(View view) {
+    public void setHeaderView(View view) {
         mHeaderView = view;
         notifyDataSetChanged();
     }
@@ -188,7 +182,7 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     /**
      * add null表示删除
      */
-    public void addFooterView(View view) {
+    public void setFooterView(View view) {
         mFooterView = view;
         notifyDataSetChanged();
     }
@@ -196,7 +190,7 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     /**
      * 新的监听
      */
-    public void setOnItemClickListener(OnItemClickListener listener) {
+    public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
         super.setOnItemClickListener(listener);
     }
 
@@ -205,7 +199,7 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
      */
     @Deprecated
     @Override
-    public void setOnItemClickListener(IItemClick listener) {
+    public void setOnItemClickListener(@Nullable IAdapterItemClick listener) {
         super.setOnItemClickListener(listener);
     }
 }

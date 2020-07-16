@@ -2,24 +2,25 @@ package com.wang.example;
 
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.wang.adapters.adapter.FragmentNotifyAdapter;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
+import com.wang.adapters.adapter.BaseFragmentNotifyAdapter;
 
 import java.util.ArrayList;
 
 public class ViewPagerFragActivity extends AppCompatActivity {
 
     private ViewPager mVp;
-    private FragmentNotifyAdapter mAdapter;
+    private BaseFragmentNotifyAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,7 @@ public class ViewPagerFragActivity extends AppCompatActivity {
         for (int i = 0; i < 5; i++) {
             list.add(MyFrag.newInstance("默认值" + i * 999999999L));
         }
-        mAdapter = new FragmentNotifyAdapter(getSupportFragmentManager(), list);
+        mAdapter = new BaseFragmentNotifyAdapter(getSupportFragmentManager(), list);
         mVp.setAdapter(mAdapter);
     }
 

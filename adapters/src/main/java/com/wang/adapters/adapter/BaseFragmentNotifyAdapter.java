@@ -1,14 +1,15 @@
 package com.wang.adapters.adapter;
 
 import android.os.Parcelable;
+import android.view.View;
+import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.PagerAdapter;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import java.util.List;
  * 解决FragmentPagerAdapter界面没有变化和FragmentStatePagerAdapter刷新短暂白屏的问题
  * 刷新请使用{@link #notifyAllItem}
  */
-public final class FragmentNotifyAdapter extends PagerAdapter {
+public final class BaseFragmentNotifyAdapter extends PagerAdapter {
     public final String TAG = getClass().getSimpleName();
 
     private final FragmentManager mFragmentManager;
@@ -30,12 +31,12 @@ public final class FragmentNotifyAdapter extends PagerAdapter {
     private List<? extends CharSequence> mTitles;//tabLayout总是取title
     private int mNoDestroyPosition = POSITION_UNCHANGED;
 
-    public FragmentNotifyAdapter(FragmentManager fm, Fragment... frags) {
+    public BaseFragmentNotifyAdapter(FragmentManager fm, Fragment... frags) {
         mFragmentManager = fm;
         addFragment(frags);
     }
 
-    public FragmentNotifyAdapter(FragmentManager fm, List<? extends Fragment> frags) {
+    public BaseFragmentNotifyAdapter(FragmentManager fm, List<? extends Fragment> frags) {
         mFragmentManager = fm;
         addFragment(frags);
     }
@@ -145,7 +146,7 @@ public final class FragmentNotifyAdapter extends PagerAdapter {
     }
 
     /**
-     * 调用这个和{@link BaseAdapterVpFrag}没什么区别，已经加载的frag不会发生任何变化
+     * 调用这个和{@link BaseFragmentPagerAdapter}没什么区别，已经加载的frag不会发生任何变化
      * 请使用{@link #notifyAllItem}
      */
     @RequiresApi(999)
@@ -158,20 +159,20 @@ public final class FragmentNotifyAdapter extends PagerAdapter {
     // 以下是自定义方法
     ///////////////////////////////////////////////////////////////////////////
 
-    public FragmentNotifyAdapter addFragment(Fragment... frags) {
+    public BaseFragmentNotifyAdapter addFragment(Fragment... frags) {
         Collections.addAll(mFragments, frags);
         super.notifyDataSetChanged();//添加不会有问题
         return this;
     }
 
-    public FragmentNotifyAdapter addFragment(List<? extends Fragment> frags) {
+    public BaseFragmentNotifyAdapter addFragment(List<? extends Fragment> frags) {
         mFragments.addAll(frags);
         super.notifyDataSetChanged();//添加不会有问题
         return this;
     }
 
     /**
-     * 删除相关操作请使用{@link #getFragments}{@link #notifyAllItem}来解决白屏问题
+     * 删除相关操作请使用{@link #notifyAllItem}来解决白屏问题
      */
     public ArrayList<Fragment> getFragments() {
         return mFragments;
@@ -180,7 +181,7 @@ public final class FragmentNotifyAdapter extends PagerAdapter {
     /**
      * 添加frag的title，类似TabLayout可能会用到
      */
-    public FragmentNotifyAdapter setTitles(ArrayList<? extends CharSequence> titles) {
+    public BaseFragmentNotifyAdapter setTitles(ArrayList<? extends CharSequence> titles) {
         mTitles = titles;
         super.notifyDataSetChanged();
         return this;

@@ -1,22 +1,24 @@
-package com.wang.adapters.interfaceabstract;
+package com.wang.adapters.interfaces;
 
 import android.view.View;
+
+import androidx.annotation.NonNull;
 
 import com.wang.adapters.R;
 import com.wang.adapters.adapter.BaseAdapterRv;
 import com.wang.adapters.adapter.BaseAdapterRvList;
-import com.wang.adapters.base.BaseViewHolder;
+import com.wang.adapters.adapter.BaseViewHolder;
 
 /**
  * 点击,长按,header,footer的回调
- * 完美解决类似recyclerviewAdapter的setOnclicklistener重复new 对象的问题
+ * 完美解决类似recyclerviewAdapter的setOnClicklistener重复new 对象的问题
  * 可以看看怎么写的{@link BaseAdapterRv}
- * holder.mRLLiaoTian.setTag(R.id.tag_view_click,position);
- * holder.mRLLiaoTian.setOnClickListener(mLiaoTianListener(全局常量,不用每个都new一下));
+ * holder.mRLl.setTag(R.id.tag_view_click,position);
+ * holder.mRLl.setOnClickListener(mLlListener(全局常量,不用每个都new一下));
  */
-public abstract class OnItemClickListener implements IItemClick {
+public abstract class OnItemClickListener implements IAdapterItemClick {
     @Override
-    public final void onClick(View view) {
+    public final void onClick(@NonNull View view) {
         int position = getViewPosition(view);
         switch (position) {
             case BaseAdapterRvList.POSITION_HEADER:
@@ -32,7 +34,7 @@ public abstract class OnItemClickListener implements IItemClick {
     }
 
     @Override
-    public final boolean onLongClick(View view) {
+    public final boolean onLongClick(@NonNull View view) {
         int position = getViewPosition(view);
         switch (position) {
             case BaseAdapterRvList.POSITION_HEADER:
@@ -47,14 +49,14 @@ public abstract class OnItemClickListener implements IItemClick {
     /**
      * 获取当前view所保存的position
      */
-    protected final int getViewPosition(View view) {
+    protected final int getViewPosition(@NonNull View view) {
         return (int) view.getTag(R.id.tag_view_click);
     }
 
     /**
      * 获取当前view所在的ViewHolder
      */
-    protected final BaseViewHolder getViewHolder(View view) {
+    protected final BaseViewHolder getViewHolder(@NonNull View view) {
         return (BaseViewHolder) view.getTag(R.id.tag_view_holder);
     }
 
@@ -67,40 +69,40 @@ public abstract class OnItemClickListener implements IItemClick {
      *
      * @param listPosition list集合所对应的position,不需要-1
      */
-    protected abstract void onItemClick(View view, int listPosition);
+    public abstract void onItemClick(@NonNull View view, int listPosition);
 
     /**
      * item被长按时
      *
      * @param listPosition list集合所对应的position,不需要-1
      */
-    protected boolean onItemLongClick(View view, int listPosition) {
+    public boolean onItemLongClick(@NonNull View view, int listPosition) {
         return false;
     }
 
     /**
      * 添加的header被点击时,没有可以忽略
      */
-    protected void onHeaderClick(View view) {
+    protected void onHeaderClick(@NonNull View view) {
     }
 
     /**
      * 添加的header被长按时,没有可以忽略
      */
-    protected boolean onFooterLongClick(View view) {
+    protected boolean onFooterLongClick(@NonNull View view) {
         return false;
     }
 
     /**
      * 添加的footer被点击时,没有可以忽略
      */
-    protected void onFooterClick(View view) {
+    protected void onFooterClick(@NonNull View view) {
     }
 
     /**
      * 添加的footer被长按时,没有可以忽略
      */
-    protected boolean onHeaderLongClick(View view) {
+    protected boolean onHeaderLongClick(@NonNull View view) {
         return false;
     }
 }

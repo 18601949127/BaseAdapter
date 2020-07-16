@@ -2,10 +2,7 @@ package com.wang.adapters.utils;
 
 import java.util.Collection;
 
-/**
- * 比较杂乱的工具类,dp转px,返回2位小数,是否是空集合等
- */
-public final class Utils {
+public class ArrayUtils {
 
     //集合是否是空的
     public static boolean isEmptyArray(Collection list) {

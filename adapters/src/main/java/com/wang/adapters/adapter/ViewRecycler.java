@@ -1,13 +1,14 @@
 package com.wang.adapters.adapter;
 
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wang.adapters.utils.Utils;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.wang.adapters.utils.ArrayUtils;
 
 import java.util.ArrayList;
 
@@ -17,12 +18,12 @@ import java.util.ArrayList;
  * 在adapter初始化的时候顺便初始化mViewRecycler=new ViewRecycler<View></View>(最大缓存数);
  * 在复用时如下,也可参见{@link BaseAdapterLvs}
  * View view = mViewRecycler.get(0);
- * //回到以前的listview的复用模式了
+ * //回到以前的ListView的复用模式了
  * ViewHolder vh = null;
  * if (view == null) {
  * view = LayoutInflater.from(mActivity).inflate(R.layout.pop_list, null, false);
  * vh = new ViewHolder(view);
- * vh.lvListpopLv = (LinearLayout) view.findViewById(0);
+ * vh.lvList = (LinearLayout) view.findViewById(0);
  * view.setTag(R.id.tag_view_holder, vh);
  * } else {
  * vh = (ViewHolder) view.getTag(R.id.tag_view_holder);
@@ -49,7 +50,7 @@ public final class ViewRecycler<T> {
     /**
      * 检查是否超出缓存数量
      */
-    private void checkCahe(int viewType) {
+    private void checkCache(int viewType) {
         int size = 0, typePosition = 0;
         ArrayList<T> views = mCaches.get(viewType);
         for (int i = 0; i < mCaches.size(); i++) {
@@ -60,7 +61,7 @@ public final class ViewRecycler<T> {
         if (size > mMaxCacheSize) {
             //太多的话,删除下一个type的view
             ArrayList<T> vs = null;
-            while (Utils.isEmptyArray(vs)) {
+            while (ArrayUtils.isEmptyArray(vs)) {
                 vs = mCaches.valueAt((++typePosition) % mCaches.size());
             }
             vs.remove(0);
@@ -76,38 +77,38 @@ public final class ViewRecycler<T> {
      *
      * @param vg        父
      * @param childView 要回收的view
-     * @param viewType  相当于itemtype,就一种传0即可
+     * @param viewType  相当于itemType,就一种传0即可
      */
-    public void recuclerItem(@Nullable ViewGroup vg, @NonNull T childView, int viewType) {
-        recuclerItem(childView, viewType);
+    public void recycleItem(@Nullable ViewGroup vg, @NonNull T childView, int viewType) {
+        recycleItem(childView, viewType);
         if (vg != null) vg.removeView((View) childView);
     }
 
-    public void recuclerItem(@NonNull ViewGroup vg, int childIndex, int viewType) {
+    public void recycleItem(@NonNull ViewGroup vg, int childIndex, int viewType) {
         //noinspection unchecked
-        recuclerItem((T) vg.getChildAt(childIndex), viewType);
+        recycleItem((T) vg.getChildAt(childIndex), viewType);
         vg.removeViewAt(childIndex);
     }
 
-    public void recuclerItem(T item, int viewType) {
+    public void recycleItem(T item, int viewType) {
         ArrayList<T> views = mCaches.get(viewType);
         if (views == null) {
             views = new ArrayList<>();
             mCaches.append(viewType, views);
         }
         views.add(item);
-        checkCahe(viewType);
+        checkCache(viewType);
     }
 
-    public void recuclerAllItem(ViewGroup vg, int viewType) {
+    public void recycleAllItem(ViewGroup vg, int viewType) {
         for (int i = vg.getChildCount() - 1; i >= 0; i--) {
-            recuclerItem(vg, i, viewType);
+            recycleItem(vg, i, viewType);
         }
     }
 
     public T get(int viewType) {
         ArrayList<T> views = mCaches.get(viewType);
-        return Utils.isEmptyArray(views) ? null : views.remove(0);
+        return ArrayUtils.isEmptyArray(views) ? null : views.remove(0);
     }
 
     /**
@@ -119,7 +120,7 @@ public final class ViewRecycler<T> {
 
     public void clearCache(int viewType) {
         ArrayList<T> views = mCaches.get(viewType);
-        if (!Utils.isEmptyArray(views)) views.clear();
+        if (!ArrayUtils.isEmptyArray(views)) views.clear();
     }
 
     public void clearAllCache() {
