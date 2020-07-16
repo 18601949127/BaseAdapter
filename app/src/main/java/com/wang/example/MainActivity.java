@@ -3,7 +3,6 @@ package com.wang.example;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,7 +18,6 @@ import com.wang.adapters.adapter.BaseViewHolder;
 import com.wang.adapters.interfaces.OnItemClickListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 200; i++) {
             list.add("第" + i);
         }
-        ListAdapter adapter = new ListAdapter(list);
+        ListAdapter adapter = new ListAdapter();
+        adapter.setListAndNotifyDataSetChanged(list);
         mRv.setAdapter(adapter);
         //设置点击事件
         adapter.setOnItemClickListener(new OnItemClickListener() {
@@ -85,27 +83,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-    public static class ListAdapter extends BaseAdapterRvList<BaseViewHolder, String> {
-
-        ListAdapter(List<String> list) {
-            super(list);
-        }
-
-        @NonNull
-        @Override
-        protected BaseViewHolder onCreateViewHolder3(ViewGroup parent) {
-            TextView tv = new AppCompatTextView(parent.getContext());
-            tv.setTextSize(20);
-            tv.setTextColor(0xff000000);
-            tv.setPadding(20, 20, 20, 20);
-            return new BaseViewHolder(tv);
-        }
+    public static class ListAdapter extends BaseAdapterRvList<ListAdapter.ViewHolder, String> {
 
         @Override
-        protected void onBindViewHolder3(BaseViewHolder holder, int listPosition, String s) {
-            TextView tv = (TextView) holder.itemView;
-            tv.setText(s);
+        protected void onBindViewHolder3(ListAdapter.ViewHolder holder, int listPosition, String s) {
+            holder.mTvText.setText(s);
+        }
+
+        static class ViewHolder extends BaseViewHolder {
+            private final TextView mTvText;
+
+            protected ViewHolder() {
+                super(R.layout.adapter_main_list);
+                mTvText = itemView.findViewById(R.id.tv_main_adapter_text);
+            }
         }
     }
 
