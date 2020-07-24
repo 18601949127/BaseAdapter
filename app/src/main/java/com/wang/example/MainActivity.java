@@ -49,8 +49,14 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 200; i++) {
             list.add("第" + i);
         }
-        BaseAdapterRvList<?, String> adapter = BaseAdapterRvList.createAdapter(R.layout.adapter_main_list);
+//        BaseAdapterRvList<?, String> adapter = BaseAdapterRvList.createAdapter(R.layout.adapter_main_list);
 //        BaseAdapterRvList<?, String> adapter = new ListAdapter();
+        BaseAdapterRvList<AdapterMainListBinding, String> adapter = BaseAdapterRvList.createAdapter(list, R.layout.adapter_main_list,
+                (holder, listPosition, s) -> {
+                    if (s.contains("10")) {
+                        holder.itemView.setBackgroundColor(0xff999999);
+                    }
+                });
         adapter.setListAndNotifyDataSetChanged(list);
         mRv.setAdapter(adapter);
         //设置点击事件

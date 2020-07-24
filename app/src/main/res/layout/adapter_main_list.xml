@@ -4,6 +4,7 @@
 
     <data>
 
+        <!--        adapter默认会设置并刷新“bean”这个属性-->
         <variable
             name="bean"
             type="String" />

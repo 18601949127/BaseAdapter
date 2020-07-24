@@ -1,24 +1,34 @@
-# 代码非常简单
+# 代码非常简单，基于dataBinding
 
 ## 详细示例见本项目app下的MainActivity
-一个listAdapter只需要如下几行
+一个listAdapter只需要如下一行（没错，总共就一行）
 ```
-    public static class ListAdapter extends BaseAdapterRvList<ListAdapter.ViewHolder, String> {
+   BaseAdapterRvList<?, String> adapter = BaseAdapterRvList.createAdapter(R.layout.adapter_main_list);
+```
+当然，你的xml是基于dataBinding的
+```
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-        @Override
-        protected void onBindViewHolder3(ListAdapter.ViewHolder holder, int listPosition, String s) {
-            holder.mTvText.setText(s);
-        }
+    <data>
 
-        static class ViewHolder extends BaseViewHolder {
-            private final TextView mTvText;
+        <!--        adapter默认会设置并刷新“bean”这个属性-->
+        <variable
+            name="bean"
+            type="String" />
+    </data>
 
-            protected ViewHolder() {
-                super(R.layout.adapter_main_list);
-                mTvText = itemView.findViewById(R.id.tv_main_adapter_text);
-            }
-        }
-    }
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:padding="10dp"
+        android:text="@{bean}"
+        android:textColor="#333"
+        android:textSize="20sp"
+        tools:text="这是文本" />
+</layout>
 ```
 自带点击事件
 ```
@@ -43,17 +53,39 @@
         adapter.setHeaderView(view);
         adapter.setFooterView(view);
 ```
-懒人专属
+当然你也可以自定义一些简单逻辑
 ```
-BaseAdapterRvList<BaseViewHolder, String> adapter = BaseAdapterRvList.createAdapter(R.layout.adapter_main_list, new BaseAdapterRvList.OnAdapterBindListener<String>() {
-    @Override
-    public void onBindVH(BaseViewHolder holder, int listPosition, String s) {
-        holder.setText(R.id.tv_main_adapter_text, s);
+BaseAdapterRvList<AdapterMainListBinding, String> adapter = BaseAdapterRvList.createAdapter(list, R.layout.adapter_main_list,
+        (holder, listPosition, s) -> {
+            if (s.contains("10")) {
+                holder.itemView.setBackgroundColor(0xff999999);
+            }
+        });//回调还有onViewHolderCreated方法
+```
+也可以完全自定义
+```
+    public static class ListAdapter extends BaseAdapterRvList<AdapterMainListBinding, String> {
+        public ListAdapter() {
+            super(R.layout.adapter_main_list);
+        }
+
+        @Override
+        protected void onBindViewHolder3(BaseViewHolder<AdapterMainListBinding> holder, int listPosition, String s) {
+            if (s.contains("100")) {
+                getList().set(listPosition, "改掉了100");//后面会调用刷新dataBinding
+            } else if (s.contains("10")) {
+                holder.itemView.setBackgroundColor(0xff999999);
+            }
+        }
+
+        @NonNull
+        @Override
+        protected BaseViewHolder<ViewDataBinding> onCreateViewHolder3(ViewGroup parent) {
+            BaseViewHolder<ViewDataBinding> holder = super.onCreateViewHolder3(parent);//你也可以不调用super，自己用黄油刀实现
+            holder.itemView.setBackgroundColor(0xffeeeeee);
+            return holder;
+        }
     }
-});
-mRv.setAdapter(adapter);
-//...刷新数据时
-adapter.setListAndNotifyDataSetChanged(list);
 ```
 ViewPager的Fragment更简单
 ```

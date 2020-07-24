@@ -293,10 +293,27 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
                     listener.onBindViewHolder(holder, listPosition, bean);
                 }
             }
+
+            @NonNull
+            @Override
+            protected BaseViewHolder<ViewDataBinding> onCreateViewHolder3(ViewGroup parent) {
+                BaseViewHolder<ViewDataBinding> holder = super.onCreateViewHolder3(parent);
+                if (listener != null) {
+                    //noinspection unchecked 本来就是T
+                    listener.onViewHolderCreated((BaseViewHolder<T>) holder);
+                }
+                return holder;
+            }
         };
     }
 
     public interface OnAdapterBindListener<T extends ViewDataBinding, BEAN> {
         void onBindViewHolder(BaseViewHolder<T> holder, int listPosition, BEAN bean);
+
+        /**
+         * 当viewHolder创建完成后
+         */
+        default void onViewHolderCreated(BaseViewHolder<T> holder) {
+        }
     }
 }
