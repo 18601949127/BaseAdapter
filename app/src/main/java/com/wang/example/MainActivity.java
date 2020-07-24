@@ -3,19 +3,21 @@ package com.wang.example;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.wang.adapters.adapter.BaseAdapterRvList;
 import com.wang.adapters.adapter.BaseViewHolder;
 import com.wang.adapters.interfaces.OnItemClickListener;
+import com.wang.example.databinding.AdapterMainListBinding;
 
 import java.util.ArrayList;
 
@@ -47,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 200; i++) {
             list.add("第" + i);
         }
-        ListAdapter adapter = new ListAdapter();
+        BaseAdapterRvList<?, String> adapter = BaseAdapterRvList.createAdapter(R.layout.adapter_main_list);
+//        BaseAdapterRvList<?, String> adapter = new ListAdapter();
         adapter.setListAndNotifyDataSetChanged(list);
         mRv.setAdapter(adapter);
         //设置点击事件
@@ -83,20 +86,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public static class ListAdapter extends BaseAdapterRvList<ListAdapter.ViewHolder, String> {
-
-        @Override
-        protected void onBindViewHolder3(ListAdapter.ViewHolder holder, int listPosition, String s) {
-            holder.mTvText.setText(s);
+    public static class ListAdapter extends BaseAdapterRvList<AdapterMainListBinding, String> {
+        public ListAdapter() {
+            super(R.layout.adapter_main_list);
         }
 
-        static class ViewHolder extends BaseViewHolder {
-            private final TextView mTvText;
-
-            protected ViewHolder() {
-                super(R.layout.adapter_main_list);
-                mTvText = itemView.findViewById(R.id.tv_main_adapter_text);
+        @Override
+        protected void onBindViewHolder3(BaseViewHolder<AdapterMainListBinding> holder, int listPosition, String s) {
+            if (s.contains("100")) {
+                getList().set(listPosition, "改掉了100");//后面会调用刷新dataBinding
+            } else if (s.contains("10")) {
+                holder.itemView.setBackgroundColor(0xff999999);
             }
+        }
+
+        @NonNull
+        @Override
+        protected BaseViewHolder<ViewDataBinding> onCreateViewHolder3(ViewGroup parent) {
+            BaseViewHolder<ViewDataBinding> holder = super.onCreateViewHolder3(parent);
+            holder.itemView.setBackgroundColor(0xffeeeeee);
+            return holder;
         }
     }
 

@@ -35,7 +35,7 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
     @NonNull
     private List<BEAN> mList;
     @LayoutRes
-    private int mLayoutId;
+    protected final int mLayoutId;
 
     @Nullable
     private View mHeaderView, mFooterView;
