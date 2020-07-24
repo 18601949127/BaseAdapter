@@ -46,12 +46,13 @@
             protected void onFooterClick(@NonNull View view) {
                 super.onFooterClick(view);
             }
+            //...header、footer long click
         });
 ```
 自带header、footer
 ```
-        adapter.setHeaderView(view);
-        adapter.setFooterView(view);
+adapter.setHeaderView(view);
+adapter.setFooterView(view);
 ```
 当然你也可以自定义一些简单逻辑
 ```
@@ -81,7 +82,8 @@ BaseAdapterRvList<AdapterMainListBinding, String> adapter = BaseAdapterRvList.cr
         @NonNull
         @Override
         protected BaseViewHolder<ViewDataBinding> onCreateViewHolder3(ViewGroup parent) {
-            BaseViewHolder<ViewDataBinding> holder = super.onCreateViewHolder3(parent);//你也可以不调用super，自己用黄油刀实现
+            //你也可以不调用super，自己用黄油刀实现
+            BaseViewHolder<ViewDataBinding> holder = super.onCreateViewHolder3(parent);
             holder.itemView.setBackgroundColor(0xffeeeeee);
             return holder;
         }
@@ -93,17 +95,17 @@ mVp.setAdapter(new BaseFragmentPagerAdapter(getSupportFragmentManager(), mFrags)
 //或
 mVp.setAdapter(new BaseFragmentPagerAdapter(getSupportFragmentManager(), frag1,frag2...));
 //动态修改frag
-        mAdapter = new BaseFragmentStatePagerAdapter(getSupportFragmentManager(), mFrags);
-        mVp.setAdapter(mAdapter);
-        ...
-        mAdapter.getFragments().add(xxx);//由于内部有新的list，所以并不能用自己的mFrags
-        mAdapter.getFragments().remove(yyy);
-        mAdapter.notifyDataSetChanged();
+mAdapter = new BaseFragmentStatePagerAdapter(getSupportFragmentManager(), mFrags);
+mVp.setAdapter(mAdapter);
+...
+mAdapter.getFragments().add(xxx);//由于内部有新的list，所以并不能用自己的mFrags
+mAdapter.getFragments().remove(yyy);
+mAdapter.notifyDataSetChanged();
 //解决动态修改刷新白屏的问题
-        BaseFragmentNotifyAdapter adapter = new BaseFragmentNotifyAdapter(getSupportFragmentManager(), mFrags);
-        mVp.setAdapter(adapter);
-        ...
-        adapter.notifyAllItem(1);//保留展示在界面上的那个这样就不会白屏了，想要刷新保留的frag当然需要自己实现了，详见app下的示例
+BaseFragmentNotifyAdapter adapter = new BaseFragmentNotifyAdapter(getSupportFragmentManager(), mFrags);
+mVp.setAdapter(adapter);
+...
+adapter.notifyAllItem(1);//保留展示的frag这样就不会白屏了，想要刷新这个frag当然需要自己frag内部刷新了，详见app下的示例
 ```
 还有适用于各种复杂样式的adapter容器（如：聊天列表，首页、今日头条的列表等）：
 ```
@@ -123,7 +125,7 @@ allprojects {
 }
 ```
 然后导入
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:1.06'`
-
-AndroidX：
+AndroidX（推荐dataBinding）：
+`implementation（或api） 'com.github.weimingjue:BaseAdapter:3.01'`
+AndroidX（旧版黄油刀那种形式）：
 `implementation（或api） 'com.github.weimingjue:BaseAdapter:2.11'`
