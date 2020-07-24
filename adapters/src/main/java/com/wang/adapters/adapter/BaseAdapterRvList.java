@@ -8,8 +8,11 @@ import androidx.annotation.IntDef;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.wang.adapters.BR;
 import com.wang.adapters.R;
 import com.wang.adapters.interfaces.IAdapterItemClick;
 import com.wang.adapters.interfaces.OnItemClickListener;
@@ -17,10 +20,6 @@ import com.wang.container.interfaces.IListAdapter;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,12 +30,15 @@ import java.util.List;
  * {@link #notifyItemChanged}相关方法时注意有header时需要-1
  * bug:{@link #notifyItemChanged}方法不能刷新header、footer（header、footer不需要刷新，仅仅是先记着）
  */
-public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends BaseAdapterRv<BaseViewHolder> implements IListAdapter<BEAN, BaseViewHolder, IAdapterItemClick> {
+public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends BaseAdapterRv<ViewDataBinding> implements IListAdapter<BEAN, BaseViewHolder<ViewDataBinding>, IAdapterItemClick> {
 
     @NonNull
     private List<BEAN> mList;
+    @LayoutRes
+    private int mLayoutId;
 
-    public View mHeaderView, mFooterView;
+    @Nullable
+    private View mHeaderView, mFooterView;
 
     public static final int POSITION_HEADER = -128, POSITION_FOOTER = -127;//-128~127的integer有优化
 
@@ -47,18 +49,21 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
     public @interface AdapterListType {
     }//该变量只能传入上面几种,否则会报错
 
+    /**
+     * 没有资源id，需要重写{@link #onCreateViewHolder3}
+     */
     public BaseAdapterRvList() {
-        this(null);
+        this(0);
     }
 
-    public BaseAdapterRvList(@Nullable List<BEAN> list) {
-        this(list, null, null);
+    public BaseAdapterRvList(@LayoutRes int layoutId) {
+        this(layoutId, null);
     }
 
-    public BaseAdapterRvList(List<BEAN> list, @Nullable View headerView, @Nullable View footerView) {
+
+    public BaseAdapterRvList(@LayoutRes int layoutId, List<BEAN> list) {
+        mLayoutId = layoutId;
         mList = list == null ? new ArrayList<>() : list;
-        mHeaderView = headerView;
-        mFooterView = footerView;
     }
 
     @Override
@@ -88,8 +93,15 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
                     position--;
                 }
                 holder.itemView.setTag(R.id.tag_view_click, position);
-                //noinspection unchecked
-                onBindViewHolder3((VH) holder, position, mList.get(position));
+                if (holder.getBinding() != null) {
+                    holder.getBinding().setVariable(BR.bean, mList.get(position));
+                }
+                //noinspection unchecked 这才发现泛型擦除多好（可是其他语言都是自动转型的...）
+                onBindViewHolder3((BaseViewHolder<T>) holder, position, mList.get(position));
+
+                if (holder.getBinding() != null) {
+                    holder.getBinding().executePendingBindings();
+                }
                 break;
             default:
                 throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterRv");
@@ -98,12 +110,14 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
 
     @NonNull
     @Override
-    public final BaseViewHolder onCreateViewHolder2(ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
+    public final BaseViewHolder<ViewDataBinding> onCreateViewHolder2(ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
         switch (viewType) {
             case TYPE_HEADER:
-                return new BaseViewHolder(mHeaderView);
+                //noinspection ConstantConditions 不会为null
+                return new BaseViewHolder<>(mHeaderView);
             case TYPE_FOOTER:
-                return new BaseViewHolder(mFooterView);
+                //noinspection ConstantConditions 不会为null
+                return new BaseViewHolder<>(mFooterView);
             case TYPE_BODY:
                 return onCreateViewHolder3(parent);
             default:
@@ -121,59 +135,6 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
             return TYPE_FOOTER;
         }
         return TYPE_BODY;
-    }
-
-    /**
-     * 获取默认无参的viewHolder
-     */
-    @NonNull
-    private VH createDefaultViewHolder() {
-        Class<VH> vhClass = getViewHolderClass(getClass());
-        if (vhClass == null) {
-            throw new RuntimeException("没有找到ViewHolder");
-        } else if (vhClass == BaseViewHolder.class) {
-            throw new RuntimeException("使用BaseViewHolder时，请重写onCreateVH方法");
-        } else {
-            try {
-                Constructor<VH> constructor;
-                if (vhClass.isMemberClass() && !Modifier.isStatic(vhClass.getModifiers())) {
-                    constructor = vhClass.getDeclaredConstructor(getClass());
-                    constructor.setAccessible(true);
-                    return constructor.newInstance(this);
-                } else {
-                    constructor = vhClass.getDeclaredConstructor();
-                    constructor.setAccessible(true);
-                    return constructor.newInstance();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                //1.只支持无参
-                //2.非静态ViewHolder必须是Adapter的
-                //3.如想自定义ViewHolder，请重写覆盖onCreateVH方法
-                throw new RuntimeException("实例化无参ViewHolder失败，请看上方注释说明", e);
-            }
-        }
-    }
-
-    @Nullable
-    private Class<VH> getViewHolderClass(Class adapterClass) {
-        if (adapterClass == BaseAdapterRv.class || adapterClass == null) {
-            return null;
-        }
-        Type superType = adapterClass.getGenericSuperclass();
-        if (superType instanceof ParameterizedType) {
-            Type[] types = ((ParameterizedType) superType).getActualTypeArguments();
-            for (Type type : types) {
-                if (type instanceof Class) {
-                    Class vhClass = (Class) type;
-                    if (BaseViewHolder.class.isAssignableFrom(vhClass)) {
-                        //noinspection unchecked
-                        return (Class<VH>) vhClass;
-                    }
-                }
-            }
-        }
-        return getViewHolderClass(adapterClass.getSuperclass());
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,20 +192,26 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
     ///////////////////////////////////////////////////////////////////////////
 
     /**
+     * 你只需要处理其他数据、其他点击事件等，基本的都加上了：
+     * <p>
+     * 不需要绑定bean数据，已经默认绑定
+     * 不需要调用{@link ViewDataBinding#executePendingBindings()}，已经默认加上
+     *
      * @param listPosition 已经做过处理,就是list的position
      */
-    protected abstract void onBindViewHolder3(VH holder, int listPosition, BEAN bean);
+    protected abstract void onBindViewHolder3(BaseViewHolder<T> holder, int listPosition, BEAN bean);
 
     /**
-     * 默认用反射create
-     * 重写就别调用super了
+     * 默认用DataBinding create
+     * 不需要的话就别调用super了
+     * 你也可以重写来增加默认的操作，如：全局隐藏显示、嵌套rv的默认属性设置等
      */
     @NonNull
-    protected VH onCreateViewHolder3(ViewGroup parent) {
-        BaseViewHolder.cacheParent = parent;
-        VH vh = createDefaultViewHolder();
-        BaseViewHolder.cacheParent = null;
-        return vh;
+    protected BaseViewHolder<ViewDataBinding> onCreateViewHolder3(ViewGroup parent) {
+        if (mLayoutId == 0) {
+            throw new RuntimeException("你没有传资源id，需要自己实现并覆盖此方法");
+        }
+        return new BaseViewHolder<>(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), mLayoutId, parent, false));
     }
 
     public void setListAndNotifyDataSetChanged(@Nullable List<BEAN> list) {
@@ -264,6 +231,11 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
         notifyDataSetChanged();
     }
 
+    @Nullable
+    public View getHeaderView() {
+        return mHeaderView;
+    }
+
     /**
      * add null表示删除
      */
@@ -274,6 +246,11 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
             view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         notifyDataSetChanged();
+    }
+
+    @Nullable
+    public View getFooterView() {
+        return mFooterView;
     }
 
     /**
@@ -298,34 +275,28 @@ public abstract class BaseAdapterRvList<VH extends BaseViewHolder, BEAN> extends
 
     /**
      * 懒得不能再懒了的写法
-     * adapter里的Activity为null
+     * 就资源id，数据在xml里修改
      *
      * @param layoutId create时的资源id
-     * @param listener 当bind时回调
-     * @param <BEAN>   list数据的bean
      */
-    public static <BEAN> BaseAdapterRvList<BaseViewHolder, BEAN> createAdapter
-    (@LayoutRes final int layoutId, final OnAdapterBindListener<BEAN> listener) {
-        return createAdapter(null, layoutId, listener);
+    public static <BEAN> BaseAdapterRvList<?, BEAN> createAdapter(@LayoutRes final int layoutId) {
+        return createAdapter(null, layoutId, null);
     }
 
-    public static <BEAN> BaseAdapterRvList<BaseViewHolder, BEAN> createAdapter
-            (@Nullable List<BEAN> list, @LayoutRes final int layoutId, final OnAdapterBindListener<BEAN> listener) {
-        return new BaseAdapterRvList<BaseViewHolder, BEAN>(list) {
-            @Override
-            protected void onBindViewHolder3(BaseViewHolder holder, int listPosition, BEAN bean) {
-                listener.onBindVH(holder, listPosition, bean);
-            }
+    public static <T extends ViewDataBinding, BEAN> BaseAdapterRvList<T, BEAN> createAdapter
+            (@Nullable List<BEAN> list, @LayoutRes final int layoutId, @Nullable final OnAdapterBindListener<T, BEAN> listener) {
+        return new BaseAdapterRvList<T, BEAN>(layoutId, list) {
 
-            @NonNull
             @Override
-            protected BaseViewHolder onCreateViewHolder3(ViewGroup parent) {
-                return new BaseViewHolder(LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false));
+            protected void onBindViewHolder3(BaseViewHolder<T> holder, int listPosition, BEAN bean) {
+                if (listener != null) {
+                    listener.onBindViewHolder(holder, listPosition, bean);
+                }
             }
         };
     }
 
-    public interface OnAdapterBindListener<BEAN> {
-        void onBindVH(BaseViewHolder holder, int listPosition, BEAN bean);
+    public interface OnAdapterBindListener<T extends ViewDataBinding, BEAN> {
+        void onBindViewHolder(BaseViewHolder<T> holder, int listPosition, BEAN bean);
     }
 }

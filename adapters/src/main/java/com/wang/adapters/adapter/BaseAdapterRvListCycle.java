@@ -2,6 +2,7 @@ package com.wang.adapters.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.ViewDataBinding;
 
 import com.wang.adapters.interfaces.IAdapterItemClick;
 import com.wang.container.interfaces.IListAdapter;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * 无限滑动的adapter
  */
-public abstract class BaseAdapterRvListCycle<VH extends BaseViewHolder, BEAN> extends BaseAdapterRv<VH> implements IListAdapter<BEAN, VH, IAdapterItemClick> {
+public abstract class BaseAdapterRvListCycle<T extends ViewDataBinding, BEAN> extends BaseAdapterRv<T> implements IListAdapter<BEAN, BaseViewHolder<T>, IAdapterItemClick> {
 
     @NonNull
     private List<BEAN> mList;
@@ -32,7 +33,7 @@ public abstract class BaseAdapterRvListCycle<VH extends BaseViewHolder, BEAN> ex
     }
 
     @Override
-    protected final void onBindViewHolder2(VH holder, int position) {
+    protected final void onBindViewHolder2(BaseViewHolder<T> holder, int position) {
         //对position进行了%处理
         position = position % mList.size();
         onBindViewHolder3(holder, position, mList.get(position));
@@ -89,7 +90,7 @@ public abstract class BaseAdapterRvListCycle<VH extends BaseViewHolder, BEAN> ex
     // 以下是增加的方法
     ///////////////////////////////////////////////////////////////////////////
 
-    protected abstract void onBindViewHolder3(VH holder, int position, BEAN bean);
+    protected abstract void onBindViewHolder3(BaseViewHolder<T> holder, int position, BEAN bean);
 
     public void setListAndNotifyDataSetChanged(@Nullable List<BEAN> list) {
         mList = list == null ? new ArrayList<>() : list;

@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.wang.adapters.R;
@@ -20,20 +21,20 @@ import java.util.List;
  * 适用于rv、我自定义的{@link BaseSuperAdapter}
  * 增加点击事件
  */
-public abstract class BaseAdapterRv<VH extends BaseViewHolder> extends RecyclerView.Adapter<VH> implements BaseSuperAdapter.ISuperAdapter<VH>, IAdapter<VH, IAdapterItemClick> {
+public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerView.Adapter<BaseViewHolder<T>> implements BaseSuperAdapter.ISuperAdapter<BaseViewHolder<T>>, IAdapter<BaseViewHolder<T>, IAdapterItemClick> {
     public final String TAG = getClass().getSimpleName();
     protected IAdapterItemClick mListener;
 
     @Override
-    public final VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        VH holder = onCreateViewHolder2(parent, viewType);
+    public final BaseViewHolder<T> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        BaseViewHolder<T> holder = onCreateViewHolder2(parent, viewType);
         //保存holder，如果position无法解决问题，可以使用这个
         holder.itemView.setTag(R.id.tag_view_holder, holder);
         return holder;
     }
 
     @Override
-    public final void onBindViewHolder(VH holder, int position) {
+    public final void onBindViewHolder(BaseViewHolder<T> holder, int position) {
         //保存position
         holder.itemView.setTag(R.id.tag_view_click, position);
         //创建点击事件
@@ -66,7 +67,7 @@ public abstract class BaseAdapterRv<VH extends BaseViewHolder> extends RecyclerV
     /**
      * 给view设置点击事件到{@link #mListener}中
      * <p>
-     * 点击回调见{@link #setOnItemClickListener}{@link .OnItemClickListener}
+     * 点击回调见{@link #setOnItemClickListener}{@link OnItemClickListener}
      */
     protected final void setItemViewClick(View view, int position) {
         view.setTag(R.id.tag_view_click, position);
@@ -86,7 +87,7 @@ public abstract class BaseAdapterRv<VH extends BaseViewHolder> extends RecyclerV
         adapter.setListAndNotifyDataSetChanged(adapterList);
     }
 
-    protected abstract void onBindViewHolder2(VH holder, int position);
+    protected abstract void onBindViewHolder2(BaseViewHolder<T> holder, int position);
 
     /**
      * 注意!涉及到notifyItemInserted刷新时立即获取position可能会不正确

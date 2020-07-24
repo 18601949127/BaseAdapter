@@ -61,7 +61,7 @@ public final class ViewRecycler<T> {
         if (size > mMaxCacheSize) {
             //太多的话,删除下一个type的view
             ArrayList<T> vs = null;
-            while (ArrayUtils.isEmptyArray(vs)) {
+            while (ArrayUtils.isEmpty(vs)) {
                 vs = mCaches.valueAt((++typePosition) % mCaches.size());
             }
             vs.remove(0);
@@ -108,7 +108,7 @@ public final class ViewRecycler<T> {
 
     public T get(int viewType) {
         ArrayList<T> views = mCaches.get(viewType);
-        return ArrayUtils.isEmptyArray(views) ? null : views.remove(0);
+        return ArrayUtils.isEmpty(views) ? null : views.remove(0);
     }
 
     /**
@@ -120,7 +120,7 @@ public final class ViewRecycler<T> {
 
     public void clearCache(int viewType) {
         ArrayList<T> views = mCaches.get(viewType);
-        if (!ArrayUtils.isEmptyArray(views)) views.clear();
+        if (!ArrayUtils.isEmpty(views)) views.clear();
     }
 
     public void clearAllCache() {
