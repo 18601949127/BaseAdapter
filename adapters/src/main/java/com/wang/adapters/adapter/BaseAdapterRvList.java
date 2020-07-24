@@ -43,9 +43,9 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
 
     public static final int POSITION_HEADER = -128, POSITION_FOOTER = -127;//-128~127的integer有优化
 
-    public static final int TYPE_HEADER = 0, TYPE_BODY = 1, TYPE_FOOTER = 2;
+    public static final int TYPE_BODY = 0, TYPE_HEADER = 1, TYPE_FOOTER = 2;
 
-    @IntDef({TYPE_HEADER, TYPE_BODY, TYPE_FOOTER})
+    @IntDef({TYPE_BODY, TYPE_HEADER, TYPE_FOOTER})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdapterListType {
     }//该变量只能传入上面几种,否则会报错
