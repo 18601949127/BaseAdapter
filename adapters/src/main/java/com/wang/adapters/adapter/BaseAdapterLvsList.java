@@ -18,40 +18,36 @@ import java.util.List;
 /**
  * 和{@link BaseAdapterRvList}基本一致，适用于listView、gridView、viewPager
  */
-public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<BaseViewHolder> implements IListAdapter<BEAN, BaseViewHolder, IAdapterItemClick> {
+public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<BaseViewHolder>
+        implements IListAdapter<BEAN, BaseViewHolder, IAdapterItemClick> {
 
     @NonNull
     private List<BEAN> mList;
 
-    public View mHeaderView, mFooterView;
+    @Nullable
+    private View mHeaderView, mFooterView;
 
     public BaseAdapterLvsList() {
         this(null);
     }
 
-    public BaseAdapterLvsList(@Nullable List<BEAN> list) {
-        this(list, null, null);
-    }
-
     /**
      * @param list 内部维护了list，可以传null
      */
-    public BaseAdapterLvsList(@Nullable List<BEAN> list, @Nullable View headerView, @Nullable View footerView) {
+    public BaseAdapterLvsList(@Nullable List<BEAN> list) {
         mList = list == null ? new ArrayList<>() : list;
-        mHeaderView = headerView;
-        mFooterView = footerView;
     }
 
     @Override
     public final int getItemCount() {
         int count = 0;
-        if (mHeaderView != null) {
+        if (getHeaderView() != null) {
             count++;
         }
-        if (mFooterView != null) {
+        if (getFooterView() != null) {
             count++;
         }
-        count += mList.size();
+        count += getList().size();
         return count;
     }
 
@@ -65,12 +61,12 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
                 holder.itemView.setTag(R.id.tag_view_click, BaseAdapterRvList.POSITION_FOOTER);
                 break;
             case BaseAdapterRvList.TYPE_BODY:
-                if (mHeaderView != null) {
+                if (getHeaderView() != null) {
                     position--;
                 }
                 holder.itemView.setTag(R.id.tag_view_click, position);
                 //noinspection unchecked
-                onBindViewHolder2((VH) holder, position, mList.get(position));
+                onBindViewHolder2((VH) holder, position, getList().get(position));
                 break;
             default:
                 throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterLvs");
@@ -82,9 +78,11 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     public final BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
         switch (viewType) {
             case BaseAdapterRvList.TYPE_HEADER:
-                return new BaseViewHolder(mHeaderView);
+                //noinspection ConstantConditions 这里当然不会为null
+                return new BaseViewHolder(getHeaderView());
             case BaseAdapterRvList.TYPE_FOOTER:
-                return new BaseViewHolder(mFooterView);
+                //noinspection ConstantConditions 这里当然不会为null
+                return new BaseViewHolder(getFooterView());
             case BaseAdapterRvList.TYPE_BODY:
                 return onCreateViewHolder2(parent);
             default:
@@ -95,10 +93,10 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     @BaseAdapterRvList.AdapterListType
     @Override
     public final int getItemViewType(int position) {
-        if (mHeaderView != null && position == 0) {
+        if (getHeaderView() != null && position == 0) {
             return BaseAdapterRvList.TYPE_HEADER;
         }
-        if (mFooterView != null && getItemCount() == position + 1) {
+        if (getFooterView() != null && getItemCount() == position + 1) {
             return BaseAdapterRvList.TYPE_FOOTER;
         }
         return BaseAdapterRvList.TYPE_BODY;
@@ -122,8 +120,8 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
      */
     @NonNull
     public BEAN get(int listPosition) {
-        if (listPosition < mList.size()) {
-            return mList.get(listPosition);
+        if (listPosition < getList().size()) {
+            return getList().get(listPosition);
         }
         throw new RuntimeException("lit为空或指针越界");
     }
@@ -132,7 +130,7 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
      * 清空list,不刷新adapter
      */
     public void clear() {
-        mList.clear();
+        getList().clear();
     }
 
     /**
@@ -140,18 +138,18 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
      */
     public void addAll(@Nullable Collection<? extends BEAN> addList) {
         if (addList != null) {
-            mList.addAll(addList);
+            getList().addAll(addList);
         }
     }
 
     @Override
     public int size() {
-        return mList.size();
+        return getList().size();
     }
 
     @Override
     public boolean isEmptyList() {
-        return mList.isEmpty();
+        return getList().isEmpty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -172,19 +170,31 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     }
 
     /**
-     * add null表示删除
+     * @param view null表示删除
      */
-    public void setHeaderView(View view) {
+    public void setHeaderView(@Nullable View view) {
         mHeaderView = view;
         notifyDataSetChanged();
     }
 
+    @Nullable
+    @Override
+    public View getHeaderView() {
+        return mHeaderView;
+    }
+
     /**
-     * add null表示删除
+     * @param view null表示删除
      */
-    public void setFooterView(View view) {
+    public void setFooterView(@Nullable View view) {
         mFooterView = view;
         notifyDataSetChanged();
+    }
+
+    @Nullable
+    @Override
+    public View getFooterView() {
+        return mFooterView;
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.wang.adapters.adapter;
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -13,10 +15,11 @@ import java.util.List;
 /**
  * 无限循环滑动的adapter（主要适用于vp）
  */
-public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<VH> implements IListAdapter<BEAN, VH, IAdapterItemClick> {
+public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<VH>
+        implements IListAdapter<BEAN, VH, IAdapterItemClick> {
 
     @NonNull
-    public List<BEAN> mList;
+    private List<BEAN> mList;
 
     public BaseAdapterLvsListCycle() {
         this(null);
@@ -28,14 +31,37 @@ public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> e
 
     @Override
     public final int getItemCount() {
-        return mList.isEmpty() ? 0 : Integer.MAX_VALUE;
+        return getList().isEmpty() ? 0 : Integer.MAX_VALUE;
     }
 
     @Override
     public final void onBindViewHolder(VH holder, int position) {
         //对position进行了%处理
-        position = position % mList.size();
-        onBindViewHolder2(holder, position, mList.get(position));
+        position = position % getList().size();
+        onBindViewHolder2(holder, position, getList().get(position));
+    }
+
+    /**
+     * 不支持header、footer
+     */
+    @Override
+    public void setHeaderView(@Nullable View view) {
+    }
+
+    @Nullable
+    @Override
+    public View getHeaderView() {
+        return null;
+    }
+
+    @Override
+    public void setFooterView(@Nullable View view) {
+    }
+
+    @Nullable
+    @Override
+    public View getFooterView() {
+        return null;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,14 +82,14 @@ public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> e
      */
     @NonNull
     public BEAN get(int listPosition) {
-        return mList.get(listPosition % mList.size());
+        return getList().get(listPosition % getList().size());
     }
 
     /**
      * 清空list,不刷新adapter
      */
     public void clear() {
-        mList.clear();
+        getList().clear();
     }
 
     /**
@@ -71,18 +97,18 @@ public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> e
      */
     public void addAll(@Nullable Collection<? extends BEAN> addList) {
         if (addList != null) {
-            mList.addAll(addList);
+            getList().addAll(addList);
         }
     }
 
     @Override
     public int size() {
-        return mList.size();
+        return getList().size();
     }
 
     @Override
     public boolean isEmptyList() {
-        return mList.isEmpty();
+        return getList().isEmpty();
     }
 
     ///////////////////////////////////////////////////////////////////////////

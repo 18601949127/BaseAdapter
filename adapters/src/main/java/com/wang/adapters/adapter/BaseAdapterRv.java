@@ -21,7 +21,9 @@ import java.util.List;
  * 适用于rv、我自定义的{@link BaseSuperAdapter}
  * 增加点击事件
  */
-public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerView.Adapter<BaseViewHolder<T>> implements BaseSuperAdapter.ISuperAdapter<BaseViewHolder<T>>, IAdapter<BaseViewHolder<T>, IAdapterItemClick> {
+public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerView.Adapter<BaseViewHolder<T>>
+        implements BaseSuperAdapter.ISuperAdapter<BaseViewHolder<T>>, IAdapter<BaseViewHolder<T>, IAdapterItemClick> {
+
     public final String TAG = getClass().getSimpleName();
     protected IAdapterItemClick mListener;
 

@@ -30,7 +30,8 @@ import java.util.List;
  * {@link #notifyItemChanged}相关方法时注意有header时需要-1
  * bug:{@link #notifyItemChanged}方法不能刷新header、footer（header、footer不需要刷新，仅仅是先记着）
  */
-public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends BaseAdapterRv<ViewDataBinding> implements IListAdapter<BEAN, BaseViewHolder<ViewDataBinding>, IAdapterItemClick> {
+public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends BaseAdapterRv<ViewDataBinding>
+        implements IListAdapter<BEAN, BaseViewHolder<ViewDataBinding>, IAdapterItemClick> {
 
     @NonNull
     private List<BEAN> mList;
@@ -69,13 +70,13 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
     @Override
     public final int getItemCount() {
         int count = 0;
-        if (mHeaderView != null) {
+        if (getHeaderView() != null) {
             count++;
         }
-        if (mFooterView != null) {
+        if (getFooterView() != null) {
             count++;
         }
-        count += mList.size();
+        count += getList().size();
         return count;
     }
 
@@ -89,15 +90,15 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
                 holder.itemView.setTag(R.id.tag_view_click, POSITION_FOOTER);
                 break;
             case TYPE_BODY:
-                if (mHeaderView != null) {
+                if (getHeaderView() != null) {
                     position--;
                 }
                 holder.itemView.setTag(R.id.tag_view_click, position);
                 if (holder.getBinding() != null) {
-                    holder.getBinding().setVariable(BR.bean, mList.get(position));
+                    holder.getBinding().setVariable(BR.bean, getList().get(position));
                 }
                 //noinspection unchecked 这才发现泛型擦除多好（可是其他语言都是自动转型的...）
-                onBindViewHolder3((BaseViewHolder<T>) holder, position, mList.get(position));
+                onBindViewHolder3((BaseViewHolder<T>) holder, position, getList().get(position));
 
                 if (holder.getBinding() != null) {
                     holder.getBinding().executePendingBindings();
@@ -113,11 +114,11 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
     public final BaseViewHolder<ViewDataBinding> onCreateViewHolder2(ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
         switch (viewType) {
             case TYPE_HEADER:
-                //noinspection ConstantConditions 不会为null
-                return new BaseViewHolder<>(mHeaderView);
+                //noinspection ConstantConditions 这里当然不会为null
+                return new BaseViewHolder<>(getHeaderView());
             case TYPE_FOOTER:
-                //noinspection ConstantConditions 不会为null
-                return new BaseViewHolder<>(mFooterView);
+                //noinspection ConstantConditions 这里当然不会为null
+                return new BaseViewHolder<>(getFooterView());
             case TYPE_BODY:
                 return onCreateViewHolder3(parent);
             default:
@@ -128,13 +129,25 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
     @AdapterListType
     @Override
     public final int getItemViewType(int position) {
-        if (mHeaderView != null && position == 0) {
+        if (getHeaderView() != null && position == 0) {
             return TYPE_HEADER;
         }
-        if (mFooterView != null && getItemCount() == position + 1) {
+        if (getFooterView() != null && getItemCount() == position + 1) {
             return TYPE_FOOTER;
         }
         return TYPE_BODY;
+    }
+
+    private void notifyHeaderFooter() {
+        //没有params添加一个默认的
+        if (getHeaderView() != null && getHeaderView().getLayoutParams() == null) {
+            getHeaderView().setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        if (getFooterView() != null && getFooterView().getLayoutParams() == null) {
+            getFooterView().setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+
+        notifyDataSetChanged();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,8 +168,8 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
      */
     @NonNull
     public BEAN get(int listPosition) {
-        if (listPosition < mList.size()) {
-            return mList.get(listPosition);
+        if (listPosition < getList().size()) {
+            return getList().get(listPosition);
         }
         throw new RuntimeException("lit为空或指针越界");
     }
@@ -165,7 +178,7 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
      * 清空list,不刷新adapter
      */
     public void clear() {
-        mList.clear();
+        getList().clear();
     }
 
     /**
@@ -173,18 +186,18 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
      */
     public void addAll(@Nullable Collection<? extends BEAN> addList) {
         if (addList != null) {
-            mList.addAll(addList);
+            getList().addAll(addList);
         }
     }
 
     @Override
     public int size() {
-        return mList.size();
+        return getList().size();
     }
 
     @Override
     public boolean isEmptyList() {
-        return mList.isEmpty();
+        return getList().isEmpty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -222,13 +235,9 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
     /**
      * add null表示删除
      */
-    public void setHeaderView(View view) {
+    public void setHeaderView(@Nullable View view) {
         mHeaderView = view;
-        //没有params添加一个默认的
-        if (view != null && view.getLayoutParams() == null)
-            view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        notifyDataSetChanged();
+        notifyHeaderFooter();
     }
 
     @Nullable
@@ -239,13 +248,9 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
     /**
      * add null表示删除
      */
-    public void setFooterView(View view) {
+    public void setFooterView(@Nullable View view) {
         mFooterView = view;
-        //没有params添加一个默认的
-        if (view != null && view.getLayoutParams() == null)
-            view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        notifyDataSetChanged();
+        notifyHeaderFooter();
     }
 
     @Nullable
