@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * 所有ViewHolder的基类
  */
 public class BaseViewHolder<T extends ViewDataBinding> extends RecyclerView.ViewHolder {
+    private int mLvPosition = RecyclerView.NO_POSITION;
 
     /**
      * null不null自己知道
@@ -27,5 +28,26 @@ public class BaseViewHolder<T extends ViewDataBinding> extends RecyclerView.View
 
     public T getBinding() {
         return mBinding;
+    }
+
+    /**
+     * lv和rv都调用这个
+     */
+    public int getCommonPosition() {
+        if (mLvPosition >= 0) {
+            return mLvPosition;
+        }
+        int adapterPosition = getAdapterPosition();
+        if (adapterPosition >= 0) {
+            return adapterPosition;
+        }
+        return getLayoutPosition();
+    }
+
+    /**
+     * listView需要手动设置position
+     */
+    public void setLvPosition(int position) {
+        mLvPosition = position;
     }
 }

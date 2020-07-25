@@ -6,8 +6,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.wang.adapters.R;
-import com.wang.adapters.interfaces.IAdapterItemClick;
 import com.wang.adapters.interfaces.OnItemClickListener;
 import com.wang.container.interfaces.IListAdapter;
 
@@ -19,7 +17,7 @@ import java.util.List;
  * 和{@link BaseAdapterRvList}基本一致，适用于listView、gridView、viewPager
  */
 public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<BaseViewHolder>
-        implements IListAdapter<BEAN, BaseViewHolder, IAdapterItemClick> {
+        implements IListAdapter<BEAN, BaseViewHolder, OnItemClickListener> {
 
     @NonNull
     private List<BEAN> mList;
@@ -55,16 +53,12 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     public final void onBindViewHolder(BaseViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case BaseAdapterRvList.TYPE_HEADER:
-                holder.itemView.setTag(R.id.tag_view_click, BaseAdapterRvList.POSITION_HEADER);
-                break;
             case BaseAdapterRvList.TYPE_FOOTER:
-                holder.itemView.setTag(R.id.tag_view_click, BaseAdapterRvList.POSITION_FOOTER);
                 break;
             case BaseAdapterRvList.TYPE_BODY:
                 if (getHeaderView() != null) {
                     position--;
                 }
-                holder.itemView.setTag(R.id.tag_view_click, position);
                 //noinspection unchecked
                 onBindViewHolder2((VH) holder, position, getList().get(position));
                 break;
@@ -100,6 +94,14 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
             return BaseAdapterRvList.TYPE_FOOTER;
         }
         return BaseAdapterRvList.TYPE_BODY;
+    }
+
+    /**
+     * 几百年没用，居然忘了lv还必须重写这个方法了
+     */
+    @Override
+    public int getViewTypeCount() {
+        return 3;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,21 +197,5 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     @Override
     public View getFooterView() {
         return mFooterView;
-    }
-
-    /**
-     * 新的监听
-     */
-    public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
-        super.setOnItemClickListener(listener);
-    }
-
-    /**
-     * 不太建议使用这个，自定义的时候才会用到
-     */
-    @Deprecated
-    @Override
-    public void setOnItemClickListener(@Nullable IAdapterItemClick listener) {
-        super.setOnItemClickListener(listener);
     }
 }

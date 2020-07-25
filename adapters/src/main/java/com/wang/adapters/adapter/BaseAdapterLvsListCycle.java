@@ -5,7 +5,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.wang.adapters.interfaces.IAdapterItemClick;
+import com.wang.adapters.interfaces.OnItemClickListener;
 import com.wang.container.interfaces.IListAdapter;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
  * 无限循环滑动的adapter（主要适用于vp）
  */
 public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<VH>
-        implements IListAdapter<BEAN, VH, IAdapterItemClick> {
+        implements IListAdapter<BEAN, VH, OnItemClickListener> {
 
     @NonNull
     private List<BEAN> mList;

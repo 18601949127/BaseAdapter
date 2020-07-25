@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.ViewDataBinding;
 
-import com.wang.adapters.interfaces.IAdapterItemClick;
+import com.wang.adapters.interfaces.OnItemClickListener;
 import com.wang.container.interfaces.IListAdapter;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.List;
  * 无限滑动的adapter
  */
 public abstract class BaseAdapterRvListCycle<T extends ViewDataBinding, BEAN> extends BaseAdapterRv<T>
-        implements IListAdapter<BEAN, BaseViewHolder<T>, IAdapterItemClick> {
+        implements IListAdapter<BEAN, BaseViewHolder<T>, OnItemClickListener> {
 
     @NonNull
     private List<BEAN> mList;

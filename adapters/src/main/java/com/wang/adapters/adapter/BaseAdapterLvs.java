@@ -12,7 +12,6 @@ import androidx.annotation.RequiresApi;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.wang.adapters.R;
-import com.wang.adapters.interfaces.IAdapterItemClick;
 import com.wang.adapters.interfaces.OnItemClickListener;
 import com.wang.container.interfaces.IAdapter;
 import com.wang.container.interfaces.IListAdapter;
@@ -21,11 +20,11 @@ import com.wang.container.interfaces.IListAdapter;
  * 基类adapter，适用于listView、gridView、viewPager
  * rv已单独写{@link BaseAdapterRv}
  */
-public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAdapter implements ListAdapter, SpinnerAdapter, IAdapter<VH, IAdapterItemClick> {
+public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAdapter implements ListAdapter, SpinnerAdapter, IAdapter<VH, OnItemClickListener> {
     public final String TAG = getClass().getSimpleName();
     private final ViewRecycler<View> mRecycler = new ViewRecycler<>();
 
-    protected IAdapterItemClick mListener;
+    protected OnItemClickListener mListener;
 
     ///////////////////////////////////////////////////////////////////////////
     // lv相关
@@ -133,10 +132,10 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     private void bindViewHolder(VH holder, int position) {
         //设置点击事件,不判断会顶掉lv的itemClick事件
         if (mListener != null) {
-            holder.itemView.setTag(R.id.tag_view_click, position);
             holder.itemView.setOnClickListener(mListener);
             holder.itemView.setOnLongClickListener(mListener);
         }
+        holder.setLvPosition(position);//设置position
         onBindViewHolder(holder, position);
     }
 
@@ -144,6 +143,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     public final VH createViewHolder(@NonNull ViewGroup parent, int itemViewType) {
         VH holder = onCreateViewHolder(parent, itemViewType);
         holder.itemView.setTag(R.id.tag_view_holder, holder);
+        holder.itemView.setTag(R.id.tag_view_adapter, this);
         return holder;
     }
 
@@ -179,7 +179,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
      * 里面也有LongClick
      * 监听事件一般使用实现类{@link OnItemClickListener}
      */
-    public void setOnItemClickListener(@Nullable IAdapterItemClick listener) {
+    public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
         mListener = listener;
         notifyDataSetChanged();
     }

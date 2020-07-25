@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.wang.adapters.interfaces.IAdapterItemClick;
+import com.wang.adapters.interfaces.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -253,6 +253,6 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
         @IntRange(from = BaseSuperAdapter.mTypeMin, to = BaseSuperAdapter.mTypeMax)
         int getItemViewType(int position);
 
-        void setOnItemClickListener(IAdapterItemClick listener);
+        void setOnItemClickListener(OnItemClickListener listener);
     }
 }

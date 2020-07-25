@@ -9,7 +9,6 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.wang.adapters.R;
-import com.wang.adapters.interfaces.IAdapterItemClick;
 import com.wang.adapters.interfaces.OnItemClickListener;
 import com.wang.adapters.interfaces.OnItemItemClickListener;
 import com.wang.container.interfaces.IAdapter;
@@ -22,23 +21,21 @@ import java.util.List;
  * 增加点击事件
  */
 public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerView.Adapter<BaseViewHolder<T>>
-        implements BaseSuperAdapter.ISuperAdapter<BaseViewHolder<T>>, IAdapter<BaseViewHolder<T>, IAdapterItemClick> {
+        implements BaseSuperAdapter.ISuperAdapter<BaseViewHolder<T>>, IAdapter<BaseViewHolder<T>, OnItemClickListener> {
 
     public final String TAG = getClass().getSimpleName();
-    protected IAdapterItemClick mListener;
+    protected OnItemClickListener mListener;
 
     @Override
     public final BaseViewHolder<T> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         BaseViewHolder<T> holder = onCreateViewHolder2(parent, viewType);
-        //保存holder，如果position无法解决问题，可以使用这个
         holder.itemView.setTag(R.id.tag_view_holder, holder);
+        holder.itemView.setTag(R.id.tag_view_adapter, this);
         return holder;
     }
 
     @Override
     public final void onBindViewHolder(BaseViewHolder<T> holder, int position) {
-        //保存position
-        holder.itemView.setTag(R.id.tag_view_click, position);
         //创建点击事件
         holder.itemView.setOnClickListener(mListener);
         holder.itemView.setOnLongClickListener(mListener);
@@ -71,17 +68,19 @@ public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerV
      * <p>
      * 点击回调见{@link #setOnItemClickListener}{@link OnItemClickListener}
      */
-    protected final void setItemViewClick(View view, int position) {
-        view.setTag(R.id.tag_view_click, position);
+    protected final void setItemViewClick(View view, BaseViewHolder holder) {
+        view.setTag(R.id.tag_view_holder, holder);
+        view.setTag(R.id.tag_view_adapter, this);
         if (!(view instanceof RecyclerView)) view.setOnClickListener(mListener);
     }
 
     /**
      * 给rv设置点击事件和数据
-     * 点击回调见{@link #setOnItemClickListener}{@link OnItemItemClickListener}
+     * 点击回调必须使用{@link OnItemItemClickListener}，否则回调将会错乱
      */
-    protected final void setItemRvData(RecyclerView rv, int position, List<?> adapterList) {
-        rv.setTag(R.id.tag_view_click, position);
+    protected final void setItemRvData(RecyclerView rv, BaseViewHolder holder, List<?> adapterList) {
+        rv.setTag(R.id.tag_view_holder, holder);
+        rv.setTag(R.id.tag_view_adapter, this);
         IListAdapter adapter = (IListAdapter) rv.getAdapter();
         //noinspection ConstantConditions,unchecked
         adapter.setOnItemClickListener(mListener);
@@ -96,7 +95,7 @@ public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerV
      * 里面也有LongClick
      * 监听事件一般使用实现类{@link OnItemClickListener}
      */
-    public void setOnItemClickListener(@Nullable IAdapterItemClick listener) {
+    public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
         mListener = listener;
         notifyDataSetChanged();
     }

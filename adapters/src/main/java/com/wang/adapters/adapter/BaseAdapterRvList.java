@@ -13,8 +13,6 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.wang.adapters.BR;
-import com.wang.adapters.R;
-import com.wang.adapters.interfaces.IAdapterItemClick;
 import com.wang.adapters.interfaces.OnItemClickListener;
 import com.wang.container.interfaces.IListAdapter;
 
@@ -31,7 +29,7 @@ import java.util.List;
  * bug:{@link #notifyItemChanged}方法不能刷新header、footer（header、footer不需要刷新，仅仅是先记着）
  */
 public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends BaseAdapterRv<ViewDataBinding>
-        implements IListAdapter<BEAN, BaseViewHolder<ViewDataBinding>, IAdapterItemClick> {
+        implements IListAdapter<BEAN, BaseViewHolder<ViewDataBinding>, OnItemClickListener> {
 
     @NonNull
     private List<BEAN> mList;
@@ -40,8 +38,6 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
 
     @Nullable
     private View mHeaderView, mFooterView;
-
-    public static final int POSITION_HEADER = -128, POSITION_FOOTER = -127;//-128~127的integer有优化
 
     public static final int TYPE_BODY = 0, TYPE_HEADER = 1, TYPE_FOOTER = 2;
 
@@ -84,16 +80,12 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
     protected final void onBindViewHolder2(BaseViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case TYPE_HEADER:
-                holder.itemView.setTag(R.id.tag_view_click, POSITION_HEADER);
-                break;
             case TYPE_FOOTER:
-                holder.itemView.setTag(R.id.tag_view_click, POSITION_FOOTER);
                 break;
             case TYPE_BODY:
                 if (getHeaderView() != null) {
                     position--;
                 }
-                holder.itemView.setTag(R.id.tag_view_click, position);
                 if (holder.getBinding() != null) {
                     holder.getBinding().setVariable(BR.bean, getList().get(position));
                 }
@@ -120,7 +112,8 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
                 //noinspection ConstantConditions 这里当然不会为null
                 return new BaseViewHolder<>(getFooterView());
             case TYPE_BODY:
-                return onCreateViewHolder3(parent);
+                //noinspection unchecked 这才发现泛型擦除多好（可是其他语言都是自动转型的...）
+                return (BaseViewHolder<ViewDataBinding>) onCreateViewHolder3(parent);
             default:
                 throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterRv");
         }
@@ -220,7 +213,7 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
      * 你也可以重写来增加默认的操作，如：全局隐藏显示、嵌套rv的默认属性设置等
      */
     @NonNull
-    protected BaseViewHolder<ViewDataBinding> onCreateViewHolder3(ViewGroup parent) {
+    protected BaseViewHolder<T> onCreateViewHolder3(ViewGroup parent) {
         if (mLayoutId == 0) {
             throw new RuntimeException("你没有传资源id，需要自己实现并覆盖此方法");
         }
@@ -258,22 +251,6 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
         return mFooterView;
     }
 
-    /**
-     * 新的监听
-     */
-    public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
-        super.setOnItemClickListener(listener);
-    }
-
-    /**
-     * 不太建议使用这个，自定义的时候才会用到
-     */
-    @Deprecated
-    @Override
-    public void setOnItemClickListener(@Nullable IAdapterItemClick listener) {
-        super.setOnItemClickListener(listener);
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 追加一个懒汉写法
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,11 +278,10 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
 
             @NonNull
             @Override
-            protected BaseViewHolder<ViewDataBinding> onCreateViewHolder3(ViewGroup parent) {
-                BaseViewHolder<ViewDataBinding> holder = super.onCreateViewHolder3(parent);
+            protected BaseViewHolder<T> onCreateViewHolder3(ViewGroup parent) {
+                BaseViewHolder<T> holder = super.onCreateViewHolder3(parent);
                 if (listener != null) {
-                    //noinspection unchecked 本来就是T
-                    listener.onViewHolderCreated((BaseViewHolder<T>) holder);
+                    listener.onViewHolderCreated(holder);
                 }
                 return holder;
             }

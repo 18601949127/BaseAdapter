@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -73,8 +72,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onFooterClick(@NonNull View view) {
-                super.onFooterClick(view);
+            public void onFooterClick(@NonNull View view) {
                 Toast.makeText(MainActivity.this, "footer被点击", Toast.LENGTH_SHORT).show();
             }
         });
@@ -108,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
 
         @NonNull
         @Override
-        protected BaseViewHolder<ViewDataBinding> onCreateViewHolder3(ViewGroup parent) {
-            BaseViewHolder<ViewDataBinding> holder = super.onCreateViewHolder3(parent);
+        protected BaseViewHolder<AdapterMainListBinding> onCreateViewHolder3(ViewGroup parent) {
+            BaseViewHolder<AdapterMainListBinding> holder = super.onCreateViewHolder3(parent);
             holder.itemView.setBackgroundColor(0xffeeeeee);
             return holder;
         }
