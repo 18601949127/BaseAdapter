@@ -127,7 +127,7 @@ allprojects {
 然后导入
 
 AndroidX（推荐dataBinding）：
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:3.01'`
+`implementation（或api） 'com.github.weimingjue:BaseAdapter:3.50'`
 
 AndroidX（旧版黄油刀那种形式）：
 `implementation（或api） 'com.github.weimingjue:BaseAdapter:2.11'`
