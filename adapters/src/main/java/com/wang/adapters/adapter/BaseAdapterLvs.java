@@ -129,7 +129,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     /**
      * 请使用{@link #onBindViewHolder}
      */
-    private void bindViewHolder(VH holder, int position) {
+    public final void bindViewHolder(VH holder, int position) {
         //设置点击事件,不判断会顶掉lv的itemClick事件
         if (mListener != null) {
             holder.itemView.setOnClickListener(mListener);

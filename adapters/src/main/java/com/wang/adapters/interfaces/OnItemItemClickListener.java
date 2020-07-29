@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.wang.adapters.R;
+import com.wang.adapters.adapter.BaseAdapterRv;
 import com.wang.adapters.adapter.BaseViewHolder;
 import com.wang.container.interfaces.IAdapter;
 import com.zhy.view.flowlayout.FlowLayout;

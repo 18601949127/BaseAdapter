@@ -85,40 +85,9 @@ public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> e
         return getList().get(listPosition % getList().size());
     }
 
-    /**
-     * 清空list,不刷新adapter
-     */
-    public void clear() {
-        getList().clear();
-    }
-
-    /**
-     * 添加全部条目,不刷新adapter
-     */
-    public void addAll(@Nullable Collection<? extends BEAN> addList) {
-        if (addList != null) {
-            getList().addAll(addList);
-        }
-    }
-
-    @Override
-    public int size() {
-        return getList().size();
-    }
-
-    @Override
-    public boolean isEmptyList() {
-        return getList().isEmpty();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // 以下是增加的方法
     ///////////////////////////////////////////////////////////////////////////
 
     protected abstract void onBindViewHolder2(VH holder, int position, BEAN bean);
-
-    public void setListAndNotifyDataSetChanged(@Nullable List<BEAN> list) {
-        mList = list == null ? new ArrayList<>() : list;
-        notifyDataSetChanged();
-    }
 }

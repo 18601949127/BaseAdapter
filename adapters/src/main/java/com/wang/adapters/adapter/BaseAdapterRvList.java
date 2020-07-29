@@ -156,43 +156,6 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
         return mList;
     }
 
-    /**
-     * 获取指定bean
-     */
-    @NonNull
-    public BEAN get(int listPosition) {
-        if (listPosition < getList().size()) {
-            return getList().get(listPosition);
-        }
-        throw new RuntimeException("lit为空或指针越界");
-    }
-
-    /**
-     * 清空list,不刷新adapter
-     */
-    public void clear() {
-        getList().clear();
-    }
-
-    /**
-     * 添加全部条目,不刷新adapter
-     */
-    public void addAll(@Nullable Collection<? extends BEAN> addList) {
-        if (addList != null) {
-            getList().addAll(addList);
-        }
-    }
-
-    @Override
-    public int size() {
-        return getList().size();
-    }
-
-    @Override
-    public boolean isEmptyList() {
-        return getList().isEmpty();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // 以下是增加的方法
     ///////////////////////////////////////////////////////////////////////////
@@ -218,11 +181,6 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
             throw new RuntimeException("你没有传资源id，需要自己实现并覆盖此方法");
         }
         return new BaseViewHolder<>(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), mLayoutId, parent, false));
-    }
-
-    public void setListAndNotifyDataSetChanged(@Nullable List<BEAN> list) {
-        mList = list == null ? new ArrayList<>() : list;
-        notifyDataSetChanged();
     }
 
     /**

@@ -117,43 +117,6 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
         return mList;
     }
 
-    /**
-     * 获取指定bean
-     */
-    @NonNull
-    public BEAN get(int listPosition) {
-        if (listPosition < getList().size()) {
-            return getList().get(listPosition);
-        }
-        throw new RuntimeException("lit为空或指针越界");
-    }
-
-    /**
-     * 清空list,不刷新adapter
-     */
-    public void clear() {
-        getList().clear();
-    }
-
-    /**
-     * 添加全部条目,不刷新adapter
-     */
-    public void addAll(@Nullable Collection<? extends BEAN> addList) {
-        if (addList != null) {
-            getList().addAll(addList);
-        }
-    }
-
-    @Override
-    public int size() {
-        return getList().size();
-    }
-
-    @Override
-    public boolean isEmptyList() {
-        return getList().isEmpty();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // 以下是增加的方法
     ///////////////////////////////////////////////////////////////////////////
@@ -165,11 +128,6 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
 
     @NonNull
     protected abstract VH onCreateViewHolder2(ViewGroup parent);
-
-    public void setListAndNotifyDataSetChanged(@Nullable List<BEAN> list) {
-        mList = list == null ? new ArrayList<>() : list;
-        notifyDataSetChanged();
-    }
 
     /**
      * @param view null表示删除
