@@ -35,7 +35,7 @@ public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerV
     }
 
     @Override
-    public final void onBindViewHolder(BaseViewHolder<T> holder, int position) {
+    public final void onBindViewHolder(@NonNull BaseViewHolder<T> holder, int position) {
         //创建点击事件
         holder.itemView.setOnClickListener(mListener);
         holder.itemView.setOnLongClickListener(mListener);
@@ -88,12 +88,12 @@ public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerV
         adapter.setListAndNotifyDataSetChanged(adapterList);
     }
 
-    protected abstract void onBindViewHolder2(BaseViewHolder<T> holder, int position);
+    protected abstract void onBindViewHolder2(@NonNull BaseViewHolder<T> holder, int position);
+
+    protected abstract BaseViewHolder<T> onCreateViewHolder2(@NonNull ViewGroup parent, int viewType);
 
     /**
-     * 注意!涉及到notifyItemInserted刷新时立即获取position可能会不正确
-     * 里面也有LongClick
-     * 监听事件一般使用实现类{@link OnItemClickListener}
+     * 里面回调里也有{@link OnItemClickListener#onItemLongClick}、header、footer点击长按
      */
     public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
         mListener = listener;

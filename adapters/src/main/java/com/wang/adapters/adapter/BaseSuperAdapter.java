@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.wang.adapters.interfaces.OnItemClickListener;
+import com.wang.container.interfaces.IAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,14 +92,14 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     @Override
     public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return mItemAdapters.get(viewType / mTypeMinus).onCreateViewHolder2(parent, viewType % mTypeMinus);
+        return (BaseViewHolder) mItemAdapters.get(viewType / mTypeMinus).createViewHolder(parent, viewType % mTypeMinus);
     }
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
         mItemInfo.refreshItemInfo(position);
         //noinspection unchecked 未检查警告,此处忽略
-        mItemAdapters.get(mItemInfo.mAdapterPosition).onBindViewHolder(holder, mItemInfo.mItemPosition);
+        mItemAdapters.get(mItemInfo.mAdapterPosition).bindViewHolder(holder, mItemInfo.mItemPosition);
     }
 
     @Override
@@ -225,9 +226,9 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * adapter的接口，见实现类{@link BaseAdapterLvs}{@link BaseAdapterLvsList}
+     * adapter的接口，见实现类{@link BaseAdapterRv}{@link BaseAdapterRvList}
      */
-    public interface ISuperAdapter<VH extends BaseViewHolder> {
+    public interface ISuperAdapter<VH extends BaseViewHolder> extends IAdapter<VH, OnItemClickListener> {
         /**
          * observe主要用于notify
          * 由于recyclerview的notify方法很多,此处只使用lv的observe
@@ -236,15 +237,6 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
         void unregisterAdapterDataObserver(RecyclerView.AdapterDataObserver observer);
 
-        void notifyDataSetChanged();
-
-        int getItemCount();
-
-        @NonNull
-        VH onCreateViewHolder2(ViewGroup parent, int viewType);
-
-        void onBindViewHolder(VH holder, int position);
-
         int getSpanSize(int position);
 
         /**
@@ -252,7 +244,5 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
          */
         @IntRange(from = BaseSuperAdapter.mTypeMin, to = BaseSuperAdapter.mTypeMax)
         int getItemViewType(int position);
-
-        void setOnItemClickListener(OnItemClickListener listener);
     }
 }

@@ -176,8 +176,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
 
     /**
      * 这里的点击事件不会因有checkbox而被抢焦点
-     * 里面也有LongClick
-     * 监听事件一般使用实现类{@link OnItemClickListener}
+     * 里面回调里也有{@link OnItemClickListener#onItemLongClick}、header、footer点击长按
      */
     public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
         mListener = listener;

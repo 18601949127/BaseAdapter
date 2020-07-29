@@ -36,7 +36,7 @@ public abstract class BaseAdapterRvListCycle<T extends ViewDataBinding, BEAN> ex
     }
 
     @Override
-    protected final void onBindViewHolder2(BaseViewHolder<T> holder, int position) {
+    protected final void onBindViewHolder2(@NonNull BaseViewHolder<T> holder, int position) {
         //对position进行了%处理
         position = position % getList().size();
         onBindViewHolder3(holder, position, getList().get(position));

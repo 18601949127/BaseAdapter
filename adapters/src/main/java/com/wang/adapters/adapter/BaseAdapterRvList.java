@@ -77,7 +77,7 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
     }
 
     @Override
-    protected final void onBindViewHolder2(BaseViewHolder holder, int position) {
+    protected final void onBindViewHolder2(@NonNull BaseViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case TYPE_HEADER:
             case TYPE_FOOTER:
@@ -103,7 +103,7 @@ public abstract class BaseAdapterRvList<T extends ViewDataBinding, BEAN> extends
 
     @NonNull
     @Override
-    public final BaseViewHolder<ViewDataBinding> onCreateViewHolder2(ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
+    public final BaseViewHolder<ViewDataBinding> onCreateViewHolder2(@NonNull ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
         switch (viewType) {
             case TYPE_HEADER:
                 //noinspection ConstantConditions 这里当然不会为null
