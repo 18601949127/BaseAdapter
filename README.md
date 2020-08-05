@@ -123,7 +123,7 @@ allprojects {
 ```
 
 ### AndroidX（dataBinding，推荐）：
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:3.60'`
+`（api或）implementation 'com.github.weimingjue:BaseAdapter:3.60'`
 
 不需要layoutId，混淆要求：
 ```
@@ -132,7 +132,8 @@ allprojects {
 -keep class * extends androidx.databinding.ViewDataBinding
 ```
 ### AndroidX（dataBinding，推荐）：
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:3.50'`
+`（api或）implementation 'com.github.weimingjue:BaseAdapter:3.50'`
+
 必须要layoutId或覆盖方法
 ### AndroidX（旧版黄油刀那种形式）：
-`implementation（或api） 'com.github.weimingjue:BaseAdapter:2.11'`
+`（api或）implementation 'com.github.weimingjue:BaseAdapter:2.11'`
