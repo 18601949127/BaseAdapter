@@ -3,97 +3,75 @@ package com.wang.adapters.adapter;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.ViewDataBinding;
 
+import com.wang.adapters.helper.ListAdapterHelper;
 import com.wang.adapters.interfaces.OnItemClickListener;
 import com.wang.container.interfaces.IListAdapter;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * 和{@link BaseAdapterRvList}基本一致，适用于listView、gridView、viewPager
  */
-public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<BaseViewHolder>
-        implements IListAdapter<BEAN, BaseViewHolder, OnItemClickListener> {
+public abstract class BaseAdapterLvsList<DB extends ViewDataBinding, BEAN> extends BaseAdapterLvs<ViewDataBinding>
+        implements IListAdapter<BEAN, BaseViewHolder<ViewDataBinding>, OnItemClickListener> {
 
-    @NonNull
-    private List<BEAN> mList;
-
-    @Nullable
-    private View mHeaderView, mFooterView;
-
-    public BaseAdapterLvsList() {
-        this(null);
-    }
+    private final ListAdapterHelper<DB, BEAN> mHelper;
 
     /**
-     * @param list 内部维护了list，可以传null
+     * 资源id已经不是必须的了
+     * <p>
+     * 无资源id有2种解决方式（任选其一）：
+     * 1.什么都不做，根据泛型自动获取，但Proguard不能混淆{@link ViewDataBinding}的子类
+     * 2.重写{@link #onCreateViewHolder3}，自定义即可
      */
-    public BaseAdapterLvsList(@Nullable List<BEAN> list) {
-        mList = list == null ? new ArrayList<>() : list;
+    public BaseAdapterLvsList() {
+        this(0);
+    }
+
+    public BaseAdapterLvsList(@LayoutRes int layoutId) {
+        this(layoutId, null);
+    }
+
+
+    public BaseAdapterLvsList(@LayoutRes int layoutId, List<BEAN> list) {
+        mHelper = new ListAdapterHelper<>(this, layoutId, list);
     }
 
     @Override
     public final int getItemCount() {
-        int count = 0;
-        if (getHeaderView() != null) {
-            count++;
-        }
-        if (getFooterView() != null) {
-            count++;
-        }
-        count += getList().size();
-        return count;
+        return mHelper.getItemCount();
     }
 
     @Override
-    public final void onBindViewHolder(BaseViewHolder holder, int position) {
-        switch (getItemViewType(position)) {
-            case BaseAdapterRvList.TYPE_HEADER:
-            case BaseAdapterRvList.TYPE_FOOTER:
-                break;
-            case BaseAdapterRvList.TYPE_BODY:
-                if (getHeaderView() != null) {
-                    position--;
-                }
-                //noinspection unchecked
-                onBindViewHolder2((VH) holder, position, getList().get(position));
-                break;
-            default:
-                throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterLvs");
+    protected final void onBindViewHolder2(@NonNull BaseViewHolder holder, int position) {
+        if (mHelper.onBindViewHolder(holder, position)) {
+            int listPosition = mHelper.getListPosition(position);
+            //noinspection unchecked 这才发现泛型擦除多好（可是其他语言都是自动转型的...）
+            onBindViewHolder3((BaseViewHolder<DB>) holder, listPosition, getList().get(listPosition));
+            mHelper.executePendingBindings(holder);
         }
     }
 
     @NonNull
     @Override
-    public final BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
-        switch (viewType) {
-            case BaseAdapterRvList.TYPE_HEADER:
-                //noinspection ConstantConditions 这里当然不会为null
-                return new BaseViewHolder(getHeaderView());
-            case BaseAdapterRvList.TYPE_FOOTER:
-                //noinspection ConstantConditions 这里当然不会为null
-                return new BaseViewHolder(getFooterView());
-            case BaseAdapterRvList.TYPE_BODY:
-                return onCreateViewHolder2(parent);
-            default:
-                throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterLvs");
+    protected final BaseViewHolder<ViewDataBinding> onCreateViewHolder2(@NonNull ViewGroup parent, @ListAdapterHelper.AdapterListType int viewType) {
+        BaseViewHolder<ViewDataBinding> holder = mHelper.onCreateViewHolder(parent, viewType);
+        if (holder == null) {
+            //noinspection unchecked 这才发现泛型擦除多好（可是其他语言都是自动转型的...）
+            holder = (BaseViewHolder<ViewDataBinding>) onCreateViewHolder3(parent);
         }
+        return holder;
     }
 
-    @BaseAdapterRvList.AdapterListType
+    @ListAdapterHelper.AdapterListType
     @Override
     public final int getItemViewType(int position) {
-        if (getHeaderView() != null && position == 0) {
-            return BaseAdapterRvList.TYPE_HEADER;
-        }
-        if (getFooterView() != null && getItemCount() == position + 1) {
-            return BaseAdapterRvList.TYPE_FOOTER;
-        }
-        return BaseAdapterRvList.TYPE_BODY;
+        return mHelper.getItemViewType(position);
     }
 
     /**
@@ -114,7 +92,7 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     @NonNull
     @Override
     public List<BEAN> getList() {
-        return mList;
+        return mHelper.mList;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -122,38 +100,49 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     ///////////////////////////////////////////////////////////////////////////
 
     /**
+     * 你只需要处理其他数据、其他点击事件等，基本的都加上了：
+     * <p>
+     * 不需要绑定bean数据，已经默认绑定
+     * 不需要调用{@link ViewDataBinding#executePendingBindings()}，已经默认加上
+     *
      * @param listPosition 已经做过处理,就是list的position
      */
-    protected abstract void onBindViewHolder2(VH holder, int listPosition, BEAN bean);
+    protected abstract void onBindViewHolder3(@NonNull BaseViewHolder<DB> holder, int listPosition, BEAN bean);
 
+    /**
+     * 默认用DataBinding create
+     * 不需要的话就别调用super了
+     * 你也可以重写来增加默认的操作，如：全局隐藏显示、嵌套rv的默认属性设置等
+     */
     @NonNull
-    protected abstract VH onCreateViewHolder2(ViewGroup parent);
+    protected BaseViewHolder<DB> onCreateViewHolder3(@NonNull ViewGroup parent) {
+        return mHelper.onCreateDefaultViewHolder(parent, BaseAdapterLvsList.class, getClass());
+    }
 
     /**
      * @param view null表示删除
      */
     public void setHeaderView(@Nullable View view) {
-        mHeaderView = view;
-        notifyDataSetChanged();
+        mHelper.setHeaderView(view);
     }
 
     @Nullable
     @Override
     public View getHeaderView() {
-        return mHeaderView;
+        return mHelper.mHeaderView;
     }
 
     /**
      * @param view null表示删除
      */
+    @Override
     public void setFooterView(@Nullable View view) {
-        mFooterView = view;
-        notifyDataSetChanged();
+        mHelper.setFooterView(view);
     }
 
     @Nullable
     @Override
     public View getFooterView() {
-        return mFooterView;
+        return mHelper.mFooterView;
     }
 }

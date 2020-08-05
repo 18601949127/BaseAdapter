@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * 所有ViewHolder的基类
  */
-public class BaseViewHolder<T extends ViewDataBinding> extends RecyclerView.ViewHolder {
+public class BaseViewHolder<DB extends ViewDataBinding> extends RecyclerView.ViewHolder {
     private int mLvPosition = RecyclerView.NO_POSITION;
 
     /**
      * null不null自己知道
      */
-    private T mBinding;
+    private DB mBinding;
 
-    public BaseViewHolder(@NonNull T binding) {
+    public BaseViewHolder(@NonNull DB binding) {
         this(binding.getRoot());
         mBinding = binding;
     }
@@ -26,7 +26,7 @@ public class BaseViewHolder<T extends ViewDataBinding> extends RecyclerView.View
         super(view);
     }
 
-    public T getBinding() {
+    public DB getBinding() {
         return mBinding;
     }
 

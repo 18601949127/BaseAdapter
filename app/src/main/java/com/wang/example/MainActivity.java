@@ -49,13 +49,13 @@ public class MainActivity extends AppCompatActivity {
             list.add("第" + i);
         }
 //        BaseAdapterRvList<?, String> adapter = BaseAdapterRvList.createAdapter(R.layout.adapter_main_list);
-//        BaseAdapterRvList<?, String> adapter = new ListAdapter();
-        BaseAdapterRvList<AdapterMainListBinding, String> adapter = BaseAdapterRvList.createAdapter(null, R.layout.adapter_main_list,
-                (holder, listPosition, s) -> {
-                    if (s.contains("10")) {
-                        holder.itemView.setBackgroundColor(0xff999999);
-                    }
-                });
+        BaseAdapterRvList<?, String> adapter = new ListAdapter();
+//        BaseAdapterRvList<AdapterMainListBinding, String> adapter = BaseAdapterRvList.createAdapter(null, R.layout.adapter_main_list,
+//                (holder, listPosition, s) -> {
+//                    if (s.contains("10")) {
+//                        holder.itemView.setBackgroundColor(0xff999999);
+//                    }
+//                });
         adapter.setListAndNotifyDataSetChanged(list);
         mRv.setAdapter(adapter);
         //设置点击事件
@@ -91,12 +91,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class ListAdapter extends BaseAdapterRvList<AdapterMainListBinding, String> {
-        public ListAdapter() {
-            super(R.layout.adapter_main_list);
-        }
 
         @Override
-        protected void onBindViewHolder3(BaseViewHolder<AdapterMainListBinding> holder, int listPosition, String s) {
+        protected void onBindViewHolder3(@NonNull BaseViewHolder<AdapterMainListBinding> holder, int listPosition, String s) {
             if (s.contains("100")) {
                 getList().set(listPosition, "改掉了100");//后面会调用刷新dataBinding
             } else if (s.contains("10")) {
@@ -106,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         @NonNull
         @Override
-        protected BaseViewHolder<AdapterMainListBinding> onCreateViewHolder3(ViewGroup parent) {
+        protected BaseViewHolder<AdapterMainListBinding> onCreateViewHolder3(@NonNull ViewGroup parent) {
             BaseViewHolder<AdapterMainListBinding> holder = super.onCreateViewHolder3(parent);
             holder.itemView.setBackgroundColor(0xffeeeeee);
             return holder;

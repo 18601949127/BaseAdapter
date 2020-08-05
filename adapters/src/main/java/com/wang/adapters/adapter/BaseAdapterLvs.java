@@ -9,6 +9,7 @@ import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.databinding.ViewDataBinding;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.wang.adapters.R;
@@ -20,10 +21,10 @@ import com.wang.container.interfaces.IListAdapter;
  * 基类adapter，适用于listView、gridView、viewPager
  * rv已单独写{@link BaseAdapterRv}
  */
-public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAdapter implements ListAdapter, SpinnerAdapter, IAdapter<VH, OnItemClickListener> {
+public abstract class BaseAdapterLvs<DB extends ViewDataBinding> extends PagerAdapter implements ListAdapter, SpinnerAdapter, IAdapter<BaseViewHolder<DB>, OnItemClickListener> {
+
     public final String TAG = getClass().getSimpleName();
     private final ViewRecycler<View> mRecycler = new ViewRecycler<>();
-
     protected OnItemClickListener mListener;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -35,13 +36,13 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
 
     @Override
     public final View getView(int position, View convertView, ViewGroup parent) {
-        VH holder;
+        BaseViewHolder<DB> holder;
         if (convertView == null || convertView.getTag(R.id.tag_view_holder) == null) {
             //模仿recyclerview,除了bind是position外,其他都是viewType
             holder = createViewHolder(parent, getItemViewType(position));
         } else {
             //noinspection unchecked
-            holder = (VH) convertView.getTag(R.id.tag_view_holder);
+            holder = (BaseViewHolder<DB>) convertView.getTag(R.id.tag_view_holder);
         }
         bindViewHolder(holder, position);
         return holder.itemView;
@@ -126,25 +127,31 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
         return getItemCount();
     }
 
-    /**
-     * 请使用{@link #onBindViewHolder}
-     */
-    public final void bindViewHolder(VH holder, int position) {
+    @NonNull
+    public final BaseViewHolder<DB> createViewHolder(@NonNull ViewGroup parent, int itemViewType) {
+        return onCreateViewHolder(parent, itemViewType);
+    }
+
+    public final void bindViewHolder(BaseViewHolder<DB> holder, int position) {
+        onBindViewHolder(holder, position);
+    }
+
+    @NonNull
+    public final BaseViewHolder<DB> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        BaseViewHolder<DB> holder = onCreateViewHolder2(parent, viewType);
+        holder.itemView.setTag(R.id.tag_view_holder, holder);
+        holder.itemView.setTag(R.id.tag_view_adapter, this);
+        return holder;
+    }
+
+    public final void onBindViewHolder(@NonNull BaseViewHolder<DB> holder, int position) {
         //设置点击事件,不判断会顶掉lv的itemClick事件
         if (mListener != null) {
             holder.itemView.setOnClickListener(mListener);
             holder.itemView.setOnLongClickListener(mListener);
         }
         holder.setLvPosition(position);//设置position
-        onBindViewHolder(holder, position);
-    }
-
-    @NonNull
-    public final VH createViewHolder(@NonNull ViewGroup parent, int itemViewType) {
-        VH holder = onCreateViewHolder(parent, itemViewType);
-        holder.itemView.setTag(R.id.tag_view_holder, holder);
-        holder.itemView.setTag(R.id.tag_view_adapter, this);
-        return holder;
+        onBindViewHolder2(holder, position);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -152,7 +159,11 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * lv用到,getItemViewType的个数(巨坑,没啥用,必须大于0大于getItemViewType的最大值,并且不能太大,见{@link android.widget.AbsListView}的RecycleBin)
+     * lv用到,getItemViewType的个数
+     * <p>
+     * 巨坑，没啥用：
+     * 1.必须大于0大于getItemViewType的最大值,并且不能太大,见{@link android.widget.AbsListView}的RecycleBin)
+     * 2.多条目必须重写
      */
     @IntRange(from = 1, to = 50)
     @Override
@@ -160,6 +171,12 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
         return 1;
     }
 
+    /**
+     * lv多条目也必须重写{@link #getViewTypeCount()}
+     * <p>
+     * 必须大于0，原因同上
+     */
+    @IntRange(from = 0)
     @Override
     public int getItemViewType(int position) {
         return 0;
@@ -169,10 +186,10 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     // 以下是增加的方法
     ///////////////////////////////////////////////////////////////////////////
 
-    protected abstract void onBindViewHolder(VH holder, int position);
+    protected abstract void onBindViewHolder2(@NonNull BaseViewHolder<DB> holder, int position);
 
     @NonNull
-    protected abstract VH onCreateViewHolder(@NonNull ViewGroup parent, int itemViewType);
+    protected abstract BaseViewHolder<DB> onCreateViewHolder2(@NonNull ViewGroup parent, int viewType);
 
     /**
      * 这里的点击事件不会因有checkbox而被抢焦点

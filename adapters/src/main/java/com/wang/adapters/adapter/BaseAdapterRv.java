@@ -20,22 +20,22 @@ import java.util.List;
  * 适用于rv、我自定义的{@link BaseSuperAdapter}
  * 增加点击事件
  */
-public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerView.Adapter<BaseViewHolder<T>>
-        implements BaseSuperAdapter.ISuperAdapter<BaseViewHolder<T>>, IAdapter<BaseViewHolder<T>, OnItemClickListener> {
+public abstract class BaseAdapterRv<DB extends ViewDataBinding> extends RecyclerView.Adapter<BaseViewHolder<DB>>
+        implements BaseSuperAdapter.ISuperAdapter<BaseViewHolder<DB>>, IAdapter<BaseViewHolder<DB>, OnItemClickListener> {
 
     public final String TAG = getClass().getSimpleName();
     protected OnItemClickListener mListener;
 
     @Override
-    public final BaseViewHolder<T> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        BaseViewHolder<T> holder = onCreateViewHolder2(parent, viewType);
+    public final BaseViewHolder<DB> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        BaseViewHolder<DB> holder = onCreateViewHolder2(parent, viewType);
         holder.itemView.setTag(R.id.tag_view_holder, holder);
         holder.itemView.setTag(R.id.tag_view_adapter, this);
         return holder;
     }
 
     @Override
-    public final void onBindViewHolder(@NonNull BaseViewHolder<T> holder, int position) {
+    public final void onBindViewHolder(@NonNull BaseViewHolder<DB> holder, int position) {
         //创建点击事件
         holder.itemView.setOnClickListener(mListener);
         holder.itemView.setOnLongClickListener(mListener);
@@ -88,9 +88,10 @@ public abstract class BaseAdapterRv<T extends ViewDataBinding> extends RecyclerV
         adapter.setListAndNotifyDataSetChanged(adapterList);
     }
 
-    protected abstract void onBindViewHolder2(@NonNull BaseViewHolder<T> holder, int position);
+    protected abstract void onBindViewHolder2(@NonNull BaseViewHolder<DB> holder, int position);
 
-    protected abstract BaseViewHolder<T> onCreateViewHolder2(@NonNull ViewGroup parent, int viewType);
+    @NonNull
+    protected abstract BaseViewHolder<DB> onCreateViewHolder2(@NonNull ViewGroup parent, int viewType);
 
     /**
      * 里面回调里也有{@link OnItemClickListener#onItemLongClick}、header、footer点击长按

@@ -1,32 +1,46 @@
 package com.wang.adapters.adapter;
 
 import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.ViewDataBinding;
 
+import com.wang.adapters.helper.ListAdapterHelper;
 import com.wang.adapters.interfaces.OnItemClickListener;
+import com.wang.adapters.utils.GenericUtils;
 import com.wang.container.interfaces.IListAdapter;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * 无限循环滑动的adapter（主要适用于vp）
  */
-public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<VH>
-        implements IListAdapter<BEAN, VH, OnItemClickListener> {
+public abstract class BaseAdapterLvsListCycle<DB extends ViewDataBinding, BEAN> extends BaseAdapterLvs<DB>
+        implements IListAdapter<BEAN, BaseViewHolder<DB>, OnItemClickListener> {
 
-    @NonNull
-    private List<BEAN> mList;
+    private final ListAdapterHelper<DB, BEAN> mHelper;
 
+    /**
+     * 资源id已经不是必须的了
+     * <p>
+     * 无资源id有2种解决方式（任选其一）：
+     * 1.什么都不做，根据泛型自动获取，但Proguard不能混淆{@link ViewDataBinding}的子类
+     * 2.重写{@link #onCreateViewHolder2}，自定义即可
+     */
     public BaseAdapterLvsListCycle() {
-        this(null);
+        this(0);
     }
 
-    public BaseAdapterLvsListCycle(@Nullable List<BEAN> list) {
-        mList = list == null ? new ArrayList<>() : list;
+    public BaseAdapterLvsListCycle(@LayoutRes int layoutId) {
+        this(layoutId, null);
+    }
+
+
+    public BaseAdapterLvsListCycle(@LayoutRes int layoutId, List<BEAN> list) {
+        mHelper = new ListAdapterHelper<>(this, layoutId, list);
     }
 
     @Override
@@ -35,10 +49,10 @@ public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> e
     }
 
     @Override
-    public final void onBindViewHolder(VH holder, int position) {
+    protected final void onBindViewHolder2(@NonNull BaseViewHolder<DB> holder, int position) {
         //对position进行了%处理
         position = position % getList().size();
-        onBindViewHolder2(holder, position, getList().get(position));
+        onBindViewHolder3(holder, position, getList().get(position));
     }
 
     /**
@@ -74,20 +88,27 @@ public abstract class BaseAdapterLvsListCycle<VH extends BaseViewHolder, BEAN> e
     @NonNull
     @Override
     public List<BEAN> getList() {
-        return mList;
+        return mHelper.mList;
     }
 
     /**
      * 获取指定bean
      */
     @NonNull
-    public BEAN get(int listPosition) {
-        return getList().get(listPosition % getList().size());
+    public BEAN get(int position) {
+        return getList().get(position % getList().size());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // 以下是增加的方法
     ///////////////////////////////////////////////////////////////////////////
 
-    protected abstract void onBindViewHolder2(VH holder, int position, BEAN bean);
+
+    @NonNull
+    @Override
+    protected BaseViewHolder<DB> onCreateViewHolder2(@NonNull ViewGroup parent, int viewType) {
+        return mHelper.onCreateDefaultViewHolder(parent,BaseAdapterLvsListCycle.class, getClass());
+    }
+
+    protected abstract void onBindViewHolder3(BaseViewHolder<DB> holder, int position, BEAN bean);
 }
