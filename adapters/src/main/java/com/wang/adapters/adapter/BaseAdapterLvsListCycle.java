@@ -28,7 +28,7 @@ public abstract class BaseAdapterLvsListCycle<DB extends ViewDataBinding, BEAN> 
      * <p>
      * 无资源id有2种解决方式（任选其一）：
      * 1.什么都不做，根据泛型自动获取，但Proguard不能混淆{@link ViewDataBinding}的子类
-     * 2.重写{@link #onCreateViewHolder2}，自定义即可
+     * 2.覆盖{@link #onCreateViewHolder2}，自己自定义即可
      */
     public BaseAdapterLvsListCycle() {
         this(0);

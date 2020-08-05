@@ -63,12 +63,9 @@ BaseAdapterRvList<AdapterMainListBinding, String> adapter = BaseAdapterRvList.cr
             }
         });//回调还有onViewHolderCreated方法
 ```
-也可以完全自定义
+也可以完全自定义（没有看错，不需要layoutId）
 ```
     public static class ListAdapter extends BaseAdapterRvList<AdapterMainListBinding, String> {
-        public ListAdapter() {
-            super(R.layout.adapter_main_list);
-        }
 
         @Override
         protected void onBindViewHolder3(BaseViewHolder<AdapterMainListBinding> holder, int listPosition, String s) {
@@ -124,10 +121,18 @@ allprojects {
     }
 }
 ```
-然后导入
 
-AndroidX（推荐dataBinding）：
+### AndroidX（dataBinding，推荐）：
+`implementation（或api） 'com.github.weimingjue:BaseAdapter:3.60'`
+
+不需要layoutId，混淆要求：
+```
+#框架特殊要求
+# 根据泛型获取res资源需要
+-keep class * extends androidx.databinding.ViewDataBinding
+```
+### AndroidX（dataBinding，推荐）：
 `implementation（或api） 'com.github.weimingjue:BaseAdapter:3.50'`
-
-AndroidX（旧版黄油刀那种形式）：
+必须要layoutId或覆盖方法
+### AndroidX（旧版黄油刀那种形式）：
 `implementation（或api） 'com.github.weimingjue:BaseAdapter:2.11'`

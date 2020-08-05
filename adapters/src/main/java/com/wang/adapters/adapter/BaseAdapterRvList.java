@@ -10,7 +10,6 @@ import androidx.databinding.ViewDataBinding;
 
 import com.wang.adapters.helper.ListAdapterHelper;
 import com.wang.adapters.interfaces.OnItemClickListener;
-import com.wang.adapters.utils.GenericUtils;
 import com.wang.container.interfaces.IListAdapter;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public abstract class BaseAdapterRvList<DB extends ViewDataBinding, BEAN> extend
      * <p>
      * 无资源id有2种解决方式（任选其一）：
      * 1.什么都不做，根据泛型自动获取，但Proguard不能混淆{@link ViewDataBinding}的子类
-     * 2.重写{@link #onCreateViewHolder3}，自定义即可
+     * 2.覆盖{@link #onCreateViewHolder3}，自己自定义即可
      */
     public BaseAdapterRvList() {
         this(0);
@@ -107,12 +106,12 @@ public abstract class BaseAdapterRvList<DB extends ViewDataBinding, BEAN> extend
 
     /**
      * 默认用DataBinding create
-     * 不需要的话就别调用super了
-     * 你也可以重写来增加默认的操作，如：全局隐藏显示、嵌套rv的默认属性设置等
+     * 完全不需要的话覆盖整个方法就行了，不会出问题
+     * 你也可以重写来添加自己的默认逻辑，如：全局隐藏显示、嵌套rv的默认属性设置等
      */
     @NonNull
     protected BaseViewHolder<DB> onCreateViewHolder3(@NonNull ViewGroup parent) {
-        return mHelper.onCreateDefaultViewHolder(parent,BaseAdapterRvList.class, getClass());
+        return mHelper.onCreateDefaultViewHolder(parent, BaseAdapterRvList.class, getClass());
     }
 
     /**
