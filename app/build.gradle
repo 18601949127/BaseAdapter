@@ -9,14 +9,23 @@ android {
         versionCode 101
         versionName "1.01"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dataBinding {
+        enabled = true
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':adapters')
-    implementation 'com.android.support:recyclerview-v7:' + APPCOMPAT_VERSION
-    implementation 'com.android.support:support-v4:' + APPCOMPAT_VERSION
-    implementation 'com.android.support:appcompat-v7:' + APPCOMPAT_VERSION
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
 }

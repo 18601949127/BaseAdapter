@@ -1,27 +1,24 @@
 package com.wang.example;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatImageView;
-import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.wang.adapters.adapter.BaseAdapterRvList;
-import com.wang.adapters.base.BaseViewHolder;
-import com.wang.adapters.interfaceabstract.OnItemClickListener;
+import com.wang.adapters.adapter.BaseViewHolder;
+import com.wang.adapters.interfaces.OnItemClickListener;
+import com.wang.example.databinding.AdapterMainListBinding;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,24 +48,31 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 200; i++) {
             list.add("第" + i);
         }
-        ListAdapter adapter = new ListAdapter(this, list);
+//        BaseAdapterRvList<?, String> adapter = BaseAdapterRvList.createAdapter(R.layout.adapter_main_list);
+//        BaseAdapterRvList<?, String> adapter = new ListAdapter();
+        BaseAdapterRvList<AdapterMainListBinding, String> adapter = BaseAdapterRvList.createAdapter(null, R.layout.adapter_main_list,
+                (holder, listPosition, s) -> {
+                    if (s.contains("10")) {
+                        holder.itemView.setBackgroundColor(0xff999999);
+                    }
+                });
+        adapter.setListAndNotifyDataSetChanged(list);
         mRv.setAdapter(adapter);
         //设置点击事件
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            protected void onItemClick(View view, int listPosition) {
+            public void onItemClick(@NonNull View view, int listPosition) {
                 Toast.makeText(MainActivity.this, "点击第" + list.get(listPosition), Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            protected boolean onItemLongClick(View view, int listPosition) {
+            public boolean onItemLongClick(@NonNull View view, int listPosition) {
                 Toast.makeText(MainActivity.this, "长按第" + list.get(listPosition), Toast.LENGTH_SHORT).show();
                 return true;
             }
 
             @Override
-            protected void onFooterClick(View view) {
-                super.onFooterClick(view);
+            public void onFooterClick(@NonNull View view) {
                 Toast.makeText(MainActivity.this, "footer被点击", Toast.LENGTH_SHORT).show();
             }
         });
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         AppCompatImageView iv = new AppCompatImageView(this);
         iv.setImageResource(R.mipmap.ic_launcher);
         iv.setAdjustViewBounds(true);
-        adapter.addFooterView(iv);
+        adapter.setFooterView(iv);
         //GridLayoutManager需要将头或尾占多行
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -86,27 +90,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-    public class ListAdapter extends BaseAdapterRvList<BaseViewHolder, String> {
-
-        public ListAdapter(@NonNull Activity activity, List<String> list) {
-            super(activity, list);
+    public static class ListAdapter extends BaseAdapterRvList<AdapterMainListBinding, String> {
+        public ListAdapter() {
+            super(R.layout.adapter_main_list);
         }
 
         @Override
-        protected void onBindVH(BaseViewHolder holder, int listPosition, String s) {
-            TextView tv = (TextView) holder.itemView;
-            tv.setText(s);
+        protected void onBindViewHolder3(BaseViewHolder<AdapterMainListBinding> holder, int listPosition, String s) {
+            if (s.contains("100")) {
+                getList().set(listPosition, "改掉了100");//后面会调用刷新dataBinding
+            } else if (s.contains("10")) {
+                holder.itemView.setBackgroundColor(0xff999999);
+            }
         }
 
         @NonNull
         @Override
-        protected BaseViewHolder onCreateVH(ViewGroup parent, LayoutInflater inflater) {
-            TextView tv = new AppCompatTextView(mActivity);
-            tv.setTextSize(20);
-            tv.setTextColor(0xff000000);
-            tv.setPadding(20, 20, 20, 20);
-            return new BaseViewHolder(tv);
+        protected BaseViewHolder<AdapterMainListBinding> onCreateViewHolder3(ViewGroup parent) {
+            BaseViewHolder<AdapterMainListBinding> holder = super.onCreateViewHolder3(parent);
+            holder.itemView.setBackgroundColor(0xffeeeeee);
+            return holder;
         }
     }
 

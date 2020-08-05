@@ -1,47 +1,30 @@
 package com.wang.adapters.adapter;
 
-import android.app.Activity;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.view.PagerAdapter;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
 
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.viewpager.widget.PagerAdapter;
+
 import com.wang.adapters.R;
-import com.wang.adapters.base.BaseViewHolder;
-import com.wang.adapters.interfaceabstract.IAdapter;
-import com.wang.adapters.interfaceabstract.IAdapterList;
-import com.wang.adapters.interfaceabstract.IItemClick;
-import com.wang.adapters.interfaceabstract.OnItemClickListener;
+import com.wang.adapters.interfaces.OnItemClickListener;
+import com.wang.container.interfaces.IAdapter;
+import com.wang.container.interfaces.IListAdapter;
 
 /**
- * 超级adapter，适用于listview、gridview、viewpager
- * rv涉及到动画等,单独写{@link BaseAdapterRv}
+ * 基类adapter，适用于listView、gridView、viewPager
+ * rv已单独写{@link BaseAdapterRv}
  */
-public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAdapter implements ListAdapter, SpinnerAdapter, IAdapter {
+public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAdapter implements ListAdapter, SpinnerAdapter, IAdapter<VH, OnItemClickListener> {
     public final String TAG = getClass().getSimpleName();
+    private final ViewRecycler<View> mRecycler = new ViewRecycler<>();
 
-    protected final Activity mActivity;
-    /**
-     * 如果{@link #mActivity}是null则也是null
-     */
-    protected final LayoutInflater mInflater;
-    protected final ViewRecycler<View> mRecycler;
-
-    protected IItemClick mListener;
-
-    /**
-     * @param activity 是不是null用的时候自己知道，如果是null则{@link #mInflater}也为null
-     */
-    public BaseAdapterLvs(Activity activity) {
-        mActivity = activity;
-        mInflater = mActivity == null ? null : LayoutInflater.from(mActivity);
-        mRecycler = new ViewRecycler<>();
-    }
+    protected OnItemClickListener mListener;
 
     ///////////////////////////////////////////////////////////////////////////
     // lv相关
@@ -55,8 +38,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
         VH holder;
         if (convertView == null || convertView.getTag(R.id.tag_view_holder) == null) {
             //模仿recyclerview,除了bind是position外,其他都是viewType
-            holder = onCreateViewHolder(parent, getItemViewType(position), mInflater == null ? LayoutInflater.from(parent.getContext()) : mInflater);
-            holder.itemView.setTag(R.id.tag_view_holder, holder);
+            holder = createViewHolder(parent, getItemViewType(position));
         } else {
             //noinspection unchecked
             holder = (VH) convertView.getTag(R.id.tag_view_holder);
@@ -81,7 +63,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     }
 
     /**
-     * 此处是lv用到，list的空判断见{@link IAdapterList#isEmptyArray}
+     * 此处是lv用到，list的空判断见{@link IListAdapter#isEmptyList}
      */
     @RequiresApi(999)
     @Override
@@ -96,7 +78,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
 
     /**
      * lv为了方便,可以在lv直接获取你想要的数据,但是理论上没啥用
-     * list的使用见{@link IAdapterList}的get、clear、addAll
+     * list的使用见{@link IListAdapter}的get、clear、addAll
      */
     @Override
     public final Object getItem(int position) {
@@ -119,7 +101,7 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
 
     @Override
     public final void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-        mRecycler.recuclerItem(container, (View) object, getItemViewType(position));
+        mRecycler.recycleItem(container, (View) object, getItemViewType(position));
     }
 
     @Override
@@ -145,16 +127,24 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
     }
 
     /**
-     * 不可继承,请使用{@link #onBindViewHolder}
+     * 请使用{@link #onBindViewHolder}
      */
     public final void bindViewHolder(VH holder, int position) {
-        //设置点击事件,不判断会顶掉lv的itemclick事件
+        //设置点击事件,不判断会顶掉lv的itemClick事件
         if (mListener != null) {
-            holder.itemView.setTag(R.id.tag_view_click, position);
             holder.itemView.setOnClickListener(mListener);
             holder.itemView.setOnLongClickListener(mListener);
         }
+        holder.setLvPosition(position);//设置position
         onBindViewHolder(holder, position);
+    }
+
+    @NonNull
+    public final VH createViewHolder(@NonNull ViewGroup parent, int itemViewType) {
+        VH holder = onCreateViewHolder(parent, itemViewType);
+        holder.itemView.setTag(R.id.tag_view_holder, holder);
+        holder.itemView.setTag(R.id.tag_view_adapter, this);
+        return holder;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -181,14 +171,14 @@ public abstract class BaseAdapterLvs<VH extends BaseViewHolder> extends PagerAda
 
     protected abstract void onBindViewHolder(VH holder, int position);
 
-    protected abstract VH onCreateViewHolder(ViewGroup parent, int itemViewType, @NonNull LayoutInflater inflater);
+    @NonNull
+    protected abstract VH onCreateViewHolder(@NonNull ViewGroup parent, int itemViewType);
 
     /**
      * 这里的点击事件不会因有checkbox而被抢焦点
-     * 里面也有LongClick
-     * 监听事件一般使用实现类{@link OnItemClickListener}
+     * 里面回调里也有{@link OnItemClickListener#onItemLongClick}、header、footer点击长按
      */
-    public void setOnItemClickListener(IItemClick listener) {
+    public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
         mListener = listener;
         notifyDataSetChanged();
     }

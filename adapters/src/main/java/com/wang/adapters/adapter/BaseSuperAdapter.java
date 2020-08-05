@@ -1,15 +1,14 @@
 package com.wang.adapters.adapter;
 
-import android.app.Activity;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.wang.adapters.base.BaseViewHolder;
-import com.wang.adapters.interfaceabstract.IItemClick;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.wang.adapters.interfaces.OnItemClickListener;
+import com.wang.container.interfaces.IAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,6 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
     public final String TAG = getClass().getSimpleName();
     protected ArrayList<ISuperAdapter> mItemAdapters = new ArrayList<>();
 
-    protected final Activity mActivity;
-    protected final LayoutInflater mInflater;
     public static final int mTypeMax = 100000, mTypeMin = -100000, mTypeMinus = mTypeMax - mTypeMin;
     protected RecyclerView mRecyclerView;
     protected GridLayoutManager mLayoutManager;
@@ -80,31 +77,29 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
      * 不是GridLayoutManager类型的可以忽略.
      * 例:错误的写法mRv.setAdapter(new BaseSuperAdapter(mActivity).addAdapter(new XxxAdapter()));
      * mRv.setLayoutManager(new GridLayoutManager(mActivity, 2));
-     * 需要先setLayoutManager然后再做其他操作,原因见{@link #checkLayouManager}.
+     * 需要先setLayoutManager然后再做其他操作,原因见{@link #checkLayoutManager}.
      */
-    public BaseSuperAdapter(Activity activity) {
-        this(activity, null);
+    public BaseSuperAdapter() {
+        this(null);
     }
 
     /**
      * @param manager 如果是GridLayoutManager需要用到setSpanSizeLookup这个方法
      */
-    public BaseSuperAdapter(Activity activity, GridLayoutManager manager) {
-        mActivity = activity;
-        mInflater = LayoutInflater.from(mActivity);
-        changedLayouManager(manager);
+    public BaseSuperAdapter(GridLayoutManager manager) {
+        changedLayoutManager(manager);
     }
 
     @Override
-    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return mItemAdapters.get(viewType / mTypeMinus).onCreateViewHolder(parent, viewType % mTypeMinus, mInflater);
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return (BaseViewHolder) mItemAdapters.get(viewType / mTypeMinus).createViewHolder(parent, viewType % mTypeMinus);
     }
 
     @Override
-    public void onBindViewHolder(BaseViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
         mItemInfo.refreshItemInfo(position);
         //noinspection unchecked 未检查警告,此处忽略
-        mItemAdapters.get(mItemInfo.mAdapterPosition).onBindViewHolder(holder, mItemInfo.mItemPosition);
+        mItemAdapters.get(mItemInfo.mAdapterPosition).bindViewHolder(holder, mItemInfo.mItemPosition);
     }
 
     @Override
@@ -126,16 +121,16 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         mRecyclerView = recyclerView;
-        checkLayouManager();
+        checkLayoutManager();
     }
 
-    protected void checkLayouManager() {
+    protected void checkLayoutManager() {
         if (mRecyclerView == null) return;
-        RecyclerView.LayoutManager mamager = mRecyclerView.getLayoutManager();
-        if ((mLayoutManager == null || mLayoutManager != mamager) && mamager instanceof GridLayoutManager) {
-            changedLayouManager((GridLayoutManager) mamager);
+        RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
+        if ((mLayoutManager == null || mLayoutManager != manager) && manager instanceof GridLayoutManager) {
+            changedLayoutManager((GridLayoutManager) manager);
         }
     }
 
@@ -150,7 +145,7 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
          * 根据超级adapter的position返回子adapter的信息
          */
         private MyItemInfo refreshItemInfo(int position) {
-            //itemdapter的position=0时的真实位置
+            //itemAdapter的position=0时的真实位置
             int itemStartPosition = 0;
             for (int i = 0; i < mItemAdapters.size(); i++) {
                 int itemCount = mItemAdapters.get(i).getItemCount();
@@ -178,7 +173,7 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
             adapter.registerAdapterDataObserver(mObserver);
             mItemAdapters.add(adapter);
         }
-        checkLayouManager();
+        checkLayoutManager();
         notifyDataSetChanged();
         return this;
     }
@@ -188,7 +183,7 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
             adapter.registerAdapterDataObserver(mObserver);
             mItemAdapters.add(adapter);
         }
-        checkLayouManager();
+        checkLayoutManager();
         notifyDataSetChanged();
         return this;
     }
@@ -214,7 +209,7 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
     /**
      * 把rv的LayoutManager改成其他的GridLayoutManager时.此方法理论上没啥用
      */
-    public void changedLayouManager(GridLayoutManager manager) {
+    public void changedLayoutManager(GridLayoutManager manager) {
         if (manager == null) return;
         mLayoutManager = manager;
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -231,9 +226,9 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * adapter的接口，见实现类{@link BaseAdapterLvs}{@link BaseAdapterLvsList}
+     * adapter的接口，见实现类{@link BaseAdapterRv}{@link BaseAdapterRvList}
      */
-    public interface ISuperAdapter<VH extends BaseViewHolder> {
+    public interface ISuperAdapter<VH extends BaseViewHolder> extends IAdapter<VH, OnItemClickListener> {
         /**
          * observe主要用于notify
          * 由于recyclerview的notify方法很多,此处只使用lv的observe
@@ -242,15 +237,6 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
         void unregisterAdapterDataObserver(RecyclerView.AdapterDataObserver observer);
 
-        void notifyDataSetChanged();
-
-        int getItemCount();
-
-        @NonNull
-        VH onCreateViewHolder(ViewGroup parent, int viewType, @NonNull LayoutInflater inflater);
-
-        void onBindViewHolder(VH holder, int position);
-
         int getSpanSize(int position);
 
         /**
@@ -258,7 +244,5 @@ public final class BaseSuperAdapter extends RecyclerView.Adapter<BaseViewHolder>
          */
         @IntRange(from = BaseSuperAdapter.mTypeMin, to = BaseSuperAdapter.mTypeMax)
         int getItemViewType(int position);
-
-        void setOnItemClickListener(IItemClick listener);
     }
 }

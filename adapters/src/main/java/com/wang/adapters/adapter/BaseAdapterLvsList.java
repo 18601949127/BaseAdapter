@@ -1,63 +1,51 @@
 package com.wang.adapters.adapter;
 
-import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wang.adapters.R;
-import com.wang.adapters.base.BaseViewHolder;
-import com.wang.adapters.interfaceabstract.IAdapterList;
-import com.wang.adapters.interfaceabstract.IItemClick;
-import com.wang.adapters.interfaceabstract.OnItemClickListener;
-import com.wang.adapters.utils.Utils;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.wang.adapters.interfaces.OnItemClickListener;
+import com.wang.container.interfaces.IListAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * 和{@link BaseAdapterRvList}基本一致，适用于listview、gridview、viewpager
+ * 和{@link BaseAdapterRvList}基本一致，适用于listView、gridView、viewPager
  */
-public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<BaseViewHolder> implements IAdapterList<BEAN> {
+public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extends BaseAdapterLvs<BaseViewHolder>
+        implements IListAdapter<BEAN, BaseViewHolder, OnItemClickListener> {
 
-    protected List<BEAN> mList;
+    @NonNull
+    private List<BEAN> mList;
 
-    public View mHeaderView, mFooterView;
+    @Nullable
+    private View mHeaderView, mFooterView;
 
-    public BaseAdapterLvsList(Activity activity) {
-        this(activity, null, null, null);
-    }
-
-    public BaseAdapterLvsList(Activity activity, @Nullable List<BEAN> list) {
-        this(activity, list, null, null);
+    public BaseAdapterLvsList() {
+        this(null);
     }
 
     /**
-     * @param activity 是不是null用的时候自己知道，如果是null则{@link #mInflater}也为null
-     * @param list     是不是null用的时候自己知道
+     * @param list 内部维护了list，可以传null
      */
-    public BaseAdapterLvsList(Activity activity, List<BEAN> list, @Nullable View headerView, @Nullable View footerView) {
-        super(activity);
-        mList = list;
-        mHeaderView = headerView;
-        mFooterView = footerView;
+    public BaseAdapterLvsList(@Nullable List<BEAN> list) {
+        mList = list == null ? new ArrayList<>() : list;
     }
 
     @Override
     public final int getItemCount() {
         int count = 0;
-        if (mHeaderView != null) {
+        if (getHeaderView() != null) {
             count++;
         }
-        if (mFooterView != null) {
+        if (getFooterView() != null) {
             count++;
         }
-        if (mList != null) {
-            count += mList.size();
-        }
+        count += getList().size();
         return count;
     }
 
@@ -65,17 +53,14 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     public final void onBindViewHolder(BaseViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case BaseAdapterRvList.TYPE_HEADER:
-                holder.itemView.setTag(R.id.tag_view_click, BaseAdapterRvList.POSITION_HEADER);
-                break;
             case BaseAdapterRvList.TYPE_FOOTER:
-                holder.itemView.setTag(R.id.tag_view_click, BaseAdapterRvList.POSITION_FOOTER);
                 break;
             case BaseAdapterRvList.TYPE_BODY:
-                if (mHeaderView != null) {
+                if (getHeaderView() != null) {
                     position--;
                 }
-                holder.itemView.setTag(R.id.tag_view_click, position);
-                onBindVH((VH) holder, position, mList.get(position));
+                //noinspection unchecked
+                onBindViewHolder2((VH) holder, position, getList().get(position));
                 break;
             default:
                 throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterLvs");
@@ -84,15 +69,16 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
 
     @NonNull
     @Override
-    public final BaseViewHolder onCreateViewHolder(ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType,
-                                                   LayoutInflater inflater) {
+    public final BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @BaseAdapterRvList.AdapterListType int viewType) {
         switch (viewType) {
             case BaseAdapterRvList.TYPE_HEADER:
-                return new BaseViewHolder(mHeaderView);
+                //noinspection ConstantConditions 这里当然不会为null
+                return new BaseViewHolder(getHeaderView());
             case BaseAdapterRvList.TYPE_FOOTER:
-                return new BaseViewHolder(mFooterView);
+                //noinspection ConstantConditions 这里当然不会为null
+                return new BaseViewHolder(getFooterView());
             case BaseAdapterRvList.TYPE_BODY:
-                return onCreateVH(parent, inflater);
+                return onCreateViewHolder2(parent);
             default:
                 throw new RuntimeException("仅支持header、footer和body,想拓展请使用BaseAdapterLvs");
         }
@@ -101,13 +87,21 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     @BaseAdapterRvList.AdapterListType
     @Override
     public final int getItemViewType(int position) {
-        if (mHeaderView != null && position == 0) {
+        if (getHeaderView() != null && position == 0) {
             return BaseAdapterRvList.TYPE_HEADER;
         }
-        if (mFooterView != null && getItemCount() == position + 1) {
+        if (getFooterView() != null && getItemCount() == position + 1) {
             return BaseAdapterRvList.TYPE_FOOTER;
         }
         return BaseAdapterRvList.TYPE_BODY;
+    }
+
+    /**
+     * 几百年没用，居然忘了lv还必须重写这个方法了
+     */
+    @Override
+    public int getViewTypeCount() {
+        return 3;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,47 +111,10 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     /**
      * @return 注意list是否传了null或者根本没传
      */
+    @NonNull
     @Override
     public List<BEAN> getList() {
         return mList;
-    }
-
-    /**
-     * 获取指定bean
-     */
-    @NonNull
-    public BEAN get(int listPosition) {
-        if (mList != null && listPosition < mList.size()) {
-            return mList.get(listPosition);
-        }
-        throw new RuntimeException("lit为空或指针越界");
-    }
-
-    /**
-     * 清空list,不刷新adapter
-     */
-    public void clear() {
-        if (mList != null) mList.clear();
-    }
-
-    /**
-     * 添加全部条目,不刷新adapter
-     */
-    public void addAll(@NonNull Collection<? extends BEAN> addList) {
-        if (mList == null) {
-            mList = new ArrayList<>();
-        }
-        mList.addAll(addList);
-    }
-
-    @Override
-    public int size() {
-        return mList == null ? 0 : mList.size();
-    }
-
-    @Override
-    public boolean isEmptyArray() {
-        return Utils.isEmptyArray(mList);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -167,45 +124,36 @@ public abstract class BaseAdapterLvsList<VH extends BaseViewHolder, BEAN> extend
     /**
      * @param listPosition 已经做过处理,就是list的position
      */
-    protected abstract void onBindVH(VH holder, int listPosition, BEAN bean);
+    protected abstract void onBindViewHolder2(VH holder, int listPosition, BEAN bean);
 
     @NonNull
-    protected abstract VH onCreateVH(ViewGroup parent, LayoutInflater inflater);
-
-    public void setListAndNotifyDataSetChanged(List<BEAN> list) {
-        mList = list;
-        notifyDataSetChanged();
-    }
+    protected abstract VH onCreateViewHolder2(ViewGroup parent);
 
     /**
-     * add null表示删除
+     * @param view null表示删除
      */
-    public void addHeaderView(View view) {
+    public void setHeaderView(@Nullable View view) {
         mHeaderView = view;
         notifyDataSetChanged();
     }
 
+    @Nullable
+    @Override
+    public View getHeaderView() {
+        return mHeaderView;
+    }
+
     /**
-     * add null表示删除
+     * @param view null表示删除
      */
-    public void addFooterView(View view) {
+    public void setFooterView(@Nullable View view) {
         mFooterView = view;
         notifyDataSetChanged();
     }
 
-    /**
-     * 新的监听
-     */
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        super.setOnItemClickListener(listener);
-    }
-
-    /**
-     * 不太建议使用这个，自定义的时候才会用到
-     */
-    @Deprecated
+    @Nullable
     @Override
-    public void setOnItemClickListener(IItemClick listener) {
-        super.setOnItemClickListener(listener);
+    public View getFooterView() {
+        return mFooterView;
     }
 }
